@@ -10,17 +10,17 @@
     <string-array name="server_names">
         <item>Local</item>
         <item>Public</item>
-        <item>Offline</item>
-        <item>Development</item>
-    </string-array>
-    <string-array name="add_attachemt_types">
-        <item>Picture from search</item>
-        <item>Picture from file</item>
-        <item>Picture from camera</item>
-        <item>Pdf from search</item>
-        <item>Pdf from scholar</item>
-        <item>Pdf from file</item>
-        <item>Video from youtube</item>
-    </string-array>
+<item>Offline</item>
+<item>Development</item>
+        </string-array>
+<string-array name="add_attachemt_types">
+<item>Picture from search</item>
+<item>Picture from file</item>
+<item>Picture from camera</item>
+<item>Pdf from search</item>
+<item>Pdf from scholar</item>
+<item>Pdf from file</item>
+<item>Video from youtube</item>
+</string-array>
 
-</resources>
+        </resources>
