@@ -39,6 +39,7 @@ public class WebViewActivity extends BaseActivity implements OnMenuItemClickList
 	private boolean loadingFinished = true;
 	private boolean redirect = false;
 	private String savedUrl = "";
+	private boolean imageSearch = false;
 
 	@Override
 	public void onCreate(final Bundle savedInstanceState) {
@@ -47,6 +48,7 @@ public class WebViewActivity extends BaseActivity implements OnMenuItemClickList
 		setContentView(R.layout.activity_webview);
 		mWebView = (WebView) findViewById(R.id.webview);
 		mWebView.setOnLongClickListener(this);
+		mWebView.addJavascriptInterface(new JavaScriptInterface(), "JSI");
 		// registerForContextMenu(mWebView);
 		mWebView.getSettings().setJavaScriptEnabled(true);
 		mWebView.getSettings().setBuiltInZoomControls(true);
@@ -122,7 +124,7 @@ public class WebViewActivity extends BaseActivity implements OnMenuItemClickList
 				} else {
 					redirect = false;
 				}
-			}
+			}			
 		});
 		// mWebView.setWebChromeClient(new WebChromeClient() {
 		//
@@ -149,7 +151,10 @@ public class WebViewActivity extends BaseActivity implements OnMenuItemClickList
 		if (uri != null) {
 			String url = uri.toString();
 			mWebView.loadUrl(url);
-			mEditText.setText(url);
+			mEditText.setText(url);			
+			if(url.contains("images.google.com")){
+				imageSearch = true;
+			}
 		}
 	}
 
@@ -253,8 +258,11 @@ public class WebViewActivity extends BaseActivity implements OnMenuItemClickList
 	}
 
 	private void onActionSave() {
-
-		onActionSave(mWebView.getUrl());
+		if (!imageSearch) {
+			onActionSave(mWebView.getUrl());
+		} else {
+			getImage();
+		}
 	}
 
 	private void onActionSave(final String url) {
@@ -304,5 +312,24 @@ public class WebViewActivity extends BaseActivity implements OnMenuItemClickList
 		boolean xlarge = ((context.getResources().getConfiguration().screenLayout & Configuration.SCREENLAYOUT_SIZE_MASK) == 4);
 		boolean large = ((context.getResources().getConfiguration().screenLayout & Configuration.SCREENLAYOUT_SIZE_MASK) == Configuration.SCREENLAYOUT_SIZE_LARGE);
 		return (xlarge || large);
+	}
+	
+	private void getImage() {
+		//get the biggest image using javascript
+		String js = "javascript: ";
+		js += "var images = document.getElementsByTagName('img');";
+		js += "var tmpSize = 0; var index = 0; var ss = '';";
+		js += "for(var i = 0; i < images.length; i++){ ";
+		js += "var size = images[i].clientWidth*images[i].clientHeight;";
+		js += "if(tmpSize < size) {tmpSize = size; index = i;} ss+= size + '-' + i + ' ';}";
+		js += "window.JSI.onImageRecieved(images[index].src);";
+		mWebView.loadUrl(js);
+	}
+	
+	class JavaScriptInterface {
+		public void onImageRecieved(String url) {
+			MyLog.tempv("[onImageRecieved] " + url);
+			onActionSave(url);
+		}
 	}
 }
