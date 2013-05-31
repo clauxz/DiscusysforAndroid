@@ -2,12 +2,16 @@ package com.slobodastudio.discussions.service;
 
 import com.slobodastudio.discussions.utils.MyLog;
 
+import android.net.Uri;
 import android.os.Environment;
+import android.util.Base64;
 
 import com.nostra13.universalimageloader.utils.FileUtils;
 
 import java.io.BufferedOutputStream;
+import java.io.ByteArrayInputStream;
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -18,6 +22,8 @@ import java.nio.channels.ReadableByteChannel;
 
 public class FileDownloader {
 
+	public final static String PREFIX_BASE64="data:image/jpeg;base64,";
+	
 	private static final String DIRECTORY = Environment.DIRECTORY_DOWNLOADS;
 
 	public static File createFile(final String fileName) {
@@ -66,7 +72,8 @@ public class FileDownloader {
 			File file = createFile(fileName);
 			FileOutputStream fos = new FileOutputStream(file);
 			fos.getChannel().transferFrom(rbc, 0, 1 << 24);
-		} catch (IOException e) {
+		}
+		catch (IOException e) {
 			MyLog.e("FileDownloader", "Failed to download file: " + downloadUrl, e);
 		} catch (OutOfMemoryError e) {
 			MyLog.e("FileDownloader", "Failed to download file: " + downloadUrl, new RuntimeException(e));
@@ -97,4 +104,39 @@ public class FileDownloader {
 			MyLog.e("FileDownloader", "Failed to download file: " + downloadUrl, new RuntimeException(e));
 		}
 	}
+	
+	
+	
+	public static void saveFileFromBase64(final String url, final String fileName)
+	{
+		try
+		{
+			if(url!=null && url.length()!=0)
+			{
+				String url2=url.replace(PREFIX_BASE64, "");
+				
+				byte[] data=Base64.decode(url2, Base64.DEFAULT);
+				ByteArrayInputStream is = new ByteArrayInputStream(data);
+				try{
+					File file = createFile(fileName);
+					OutputStream os = new BufferedOutputStream(new FileOutputStream(file));
+					try{
+						FileUtils.copyStream(is, os);
+					}
+					finally{
+						os.close();
+					}
+				}finally{
+					is.close();
+				}
+			}
+			
+		} catch (IOException e) {
+			MyLog.e("FileDownloader", "Failed to save Base64 file: " + String.valueOf(url), e);
+		} catch (OutOfMemoryError e) {
+			MyLog.e("FileDownloader", "Failed to save Base64 file: " + String.valueOf(url), new RuntimeException(e));
+		}
+		
+	}
+	
 }

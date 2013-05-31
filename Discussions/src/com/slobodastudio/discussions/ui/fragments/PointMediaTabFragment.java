@@ -38,6 +38,7 @@ import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
+import android.util.Base64;
 import android.util.Log;
 import android.view.ContextMenu;
 import android.view.ContextMenu.ContextMenuInfo;
@@ -52,7 +53,11 @@ import android.widget.TextView;
 
 import com.actionbarsherlock.app.SherlockFragment;
 
+import java.io.BufferedOutputStream;
 import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
@@ -75,6 +80,9 @@ public class PointMediaTabFragment extends SherlockFragment implements OnClickLi
 	private NewAttachment newAttachment;
 	private Uri tempCameraFileUri;
 
+	
+	
+	
 	public PointMediaTabFragment() {
 
 		mAttachmentsCursorLoader = new AttachmentsCursorLoader();
@@ -293,6 +301,8 @@ public class PointMediaTabFragment extends SherlockFragment implements OnClickLi
 		final Uri uri = intent.getData();
 		logd("[handleImageSearchResult] data null: " + (uri == null));
 		if (uri != null) {
+			//*
+			
 			newAttachment = new NewAttachment(PICK_IMAGE_SEARCH_REQUEST, uri);
 			if (((BaseActivity) getActivity()).isBound()) {
 				onServiceConnected();
@@ -385,7 +395,9 @@ public class PointMediaTabFragment extends SherlockFragment implements OnClickLi
 				case PICK_IMAGE_SEARCH_REQUEST:
 					Uri originalUri = newAttachment.uri;
 					MyLog.tempv("image search url: " + originalUri.toString());
-					String fileName = originalUri.getLastPathSegment();
+					String fileName="searchResaltImageTemp.jpg";
+					if(originalUri!=null &&  originalUri.getLastPathSegment()!=null)
+						fileName= originalUri.getLastPathSegment();
 					String title = fileName.replace(".jpg", "");
 					// File savedFile = ImageLoader.getInstance().getDiscCache().get(originalUri.toString());
 					// Uri uri = Uri.fromFile(savedFile);
@@ -528,6 +540,8 @@ public class PointMediaTabFragment extends SherlockFragment implements OnClickLi
 		activity.startActivityForResult(cameraIntent, PICK_CAMERA_PHOTO);
 	}
 
+	
+	
 	private void requestImageAttachment(final Activity activity) {
 
 		Intent intent = new Intent(Intent.ACTION_GET_CONTENT);

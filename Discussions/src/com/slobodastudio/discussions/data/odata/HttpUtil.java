@@ -96,7 +96,13 @@ public class HttpUtil {
 		} else if ("file".equals(scheme)) {
 			FileEntity attachmentEntity = createImageEntityFromFile(attachmentUri);
 			return uploadAttachmentEntity(context, attachmentEntity);
-		} else {
+		} else if("data".equals(scheme))
+		{
+			FileEntity attachmentEntity = createImageEntityFromFile(attachmentUri);
+			return uploadAttachmentEntity(context, attachmentEntity);
+		}
+		else
+		{
 			throw new IllegalArgumentException("Unsupported scheme: " + scheme);
 		}
 	}

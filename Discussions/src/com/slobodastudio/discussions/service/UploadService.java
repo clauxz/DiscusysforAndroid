@@ -219,6 +219,20 @@ public class UploadService extends IntentService {
 					File file = FileDownloader.createFile(fileName);
 					attachmentUri = Uri.fromFile(file);
 				}
+				else if("data".equals(scheme))
+				{
+					ActivityResultHelper.sendProgress(mActivityReceiver, "Loading image search result", 0);
+					String fileName="searchResaltImageTemp.jpg";
+					if(attachmentUri!=null &&  attachmentUri.getLastPathSegment()!=null)
+						fileName= attachmentUri.getLastPathSegment();
+					
+					FileDownloader.saveFileFromBase64(attachmentUri.toString(), fileName);
+					File file = FileDownloader.createFile(fileName);
+					
+					attachmentUri = Uri.fromFile(file);
+					
+				}
+				
 				ActivityResultHelper.sendProgress(mActivityReceiver, "Uploading image from sdcard to server",
 						30);
 				attachmentId = HttpUtil.insertImageAttachment(this, attachmentUri);

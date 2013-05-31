@@ -20,7 +20,6 @@ import com.slobodastudio.discussions.utils.fragmentasynctask.SyncStatusUpdaterFr
 
 import android.content.Intent;
 import android.database.Cursor;
-import android.graphics.Color;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -32,7 +31,6 @@ import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.PagerTitleStrip;
 import android.support.v4.view.ViewPager;
 import android.util.Log;
-import android.util.TypedValue;
 
 import com.actionbarsherlock.view.MenuInflater;
 import com.actionbarsherlock.view.MenuItem;
@@ -71,7 +69,7 @@ public class PointsActivity extends BaseActivity implements PhotonServiceCallbac
 			@Override
 			public void run() {
 
-				pagerTitleStrip.setTextColor(Color.BLACK);// visualize photon is in offline mode
+				//pagerTitleStrip.setTextColor(Color.BLACK);// visualize photon is in offline mode
 			}
 		});
 	}
@@ -95,7 +93,7 @@ public class PointsActivity extends BaseActivity implements PhotonServiceCallbac
 			@Override
 			public void run() {
 
-				pagerTitleStrip.setTextColor(Color.RED);// visualize photon is in offline mode
+				//pagerTitleStrip.setTextColor(Color.RED);// visualize photon is in offline mode
 			}
 		});
 	}
@@ -170,7 +168,7 @@ public class PointsActivity extends BaseActivity implements PhotonServiceCallbac
 		pager = (ViewPager) super.findViewById(R.id.viewpager);
 		findViewById(R.id.abs__action_bar);
 		pagerTitleStrip = (PagerTitleStrip) findViewById(R.id.pagerTitleStrip);
-		pagerTitleStrip.setTextSize(TypedValue.COMPLEX_UNIT_SP, 24);
+		//pagerTitleStrip.setTextSize(TypedValue.COMPLEX_UNIT_SP, 24);
 		pagerTitleStrip.setPadding(5, 10, 10, 5);
 		getSupportLoaderManager().initLoader(PersonsCursorLoader.LOADER_TOPIC_PERSONS, null,
 				new PersonsCursorLoader());
