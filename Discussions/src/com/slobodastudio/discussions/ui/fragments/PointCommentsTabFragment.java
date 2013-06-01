@@ -2,6 +2,7 @@ package com.slobodastudio.discussions.ui.fragments;
 
 import com.slobodastudio.discussions.ApplicationConstants;
 import com.slobodastudio.discussions.R;
+import com.slobodastudio.discussions.data.model.Comment;
 import com.slobodastudio.discussions.data.model.SelectedPoint;
 import com.slobodastudio.discussions.data.provider.DiscussionsContract.Comments;
 import com.slobodastudio.discussions.data.provider.DiscussionsContract.Persons;
@@ -211,8 +212,10 @@ public class PointCommentsTabFragment extends SherlockFragment implements OnClic
 		int columnIndex = cursor.getColumnIndexOrThrow(Comments.Columns.ID);
 		int commentId = cursor.getInt(columnIndex);
 		((BaseActivity) getActivity()).getServiceHelper().deleteComment(commentId, mSelectedPoint);
+		
 	}
-
+	
+	
 	private void setUpCommentsAdapter() {
 
 		mCommentsAdapter = new SimpleCursorAdapter(getActivity(), R.layout.list_item_comments, null,

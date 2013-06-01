@@ -1,6 +1,7 @@
 package com.slobodastudio.discussions.ui.activities;
 
 import com.slobodastudio.discussions.R;
+import com.slobodastudio.discussions.service.FileDownloader;
 import com.slobodastudio.discussions.utils.MyLog;
 import com.slobodastudio.discussions.utils.TextViewUtils;
 
@@ -329,6 +330,17 @@ public class WebViewActivity extends BaseActivity implements OnMenuItemClickList
 	class JavaScriptInterface {
 		public void onImageRecieved(String url) {
 			MyLog.tempv("[onImageRecieved] " + url);
+
+			if(url!=null && url.length()!=0 && url.contains(FileDownloader.PREFIX_BASE64))
+			{
+				HitTestResult result = mWebView.getHitTestResult();
+				if ((result.getType() == HitTestResult.IMAGE_TYPE)
+						|| (result.getType() == HitTestResult.SRC_IMAGE_ANCHOR_TYPE)) {
+					
+					url = result.getExtra();
+				}
+			}
+			
 			onActionSave(url);
 		}
 	}
