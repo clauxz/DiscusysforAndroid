@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<com.slobodastudio.discussions.ui.view.MediaList xmlns:android="http://schemas.android.com/apk/res/android"
+<com.TohokuUniversity.discussions.ui.view.MediaList xmlns:android="http://schemas.android.com/apk/res/android"
     android:id="@+id/listview_attachments"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"

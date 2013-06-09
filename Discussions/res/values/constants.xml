@@ -7,16 +7,19 @@
     <string name="offline_database_address">tcp:192.168.167.1,8080</string>
     
     <!-- Original servers -->
-    <!-- 
     <string name="local_server_address">10.32.194.179</string>
     <string name="local_database_address">tcp:10.32.194.179,8080</string>
+    <!-- 
     <string name="development_server_address">192.168.1.122</string>
     <string name="development_database_address">MININT-P59UCPK\\SQLEXPRESS</string>
     -->
     
+    
     <!-- Alex servers -->
+    <!--
     <string name="local_server_address">192.170.1.222</string>
     <string name="local_database_address">tcp:192.170.1.222,8080</string>
+    -->
     <string name="development_server_address">192.170.1.222</string>
     <string name="development_database_address">24x36mm\\SQLEXPRESS</string>
     

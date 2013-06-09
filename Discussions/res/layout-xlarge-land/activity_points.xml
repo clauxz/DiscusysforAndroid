@@ -6,7 +6,7 @@
 
     <fragment
         android:id="@+id/fragment_points"
-        android:name="com.slobodastudio.discussions.ui.fragments.PointsFragment"
+        android:name="com.TohokuUniversity.discussions.ui.fragments.PointsFragment"
         android:layout_width="0dip"
         android:layout_height="match_parent"
         android:layout_weight="0.35" >

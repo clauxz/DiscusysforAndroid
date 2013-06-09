@@ -7,12 +7,14 @@
         <item>@string/offline_server_address</item>
         <item>@string/development_server_address</item>
     </string-array>
+    
     <string-array name="server_names">
         <item>Local</item>
         <item>Public</item>
-<item>Offline</item>
-<item>Development</item>
-        </string-array>
+        <item>Offline</item>
+        <item>Development</item>
+    </string-array>
+    
 <string-array name="add_attachemt_types">
 <item>Picture from search</item>
 <item>Picture from file</item>

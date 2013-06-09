@@ -6,7 +6,7 @@
 
     <fragment
         android:id="@+id/fragment_discussions"
-        android:name="com.slobodastudio.discussions.ui.fragments.DiscussionsListFragment"
+        android:name="com.TohokuUniversity.discussions.ui.fragments.DiscussionsListFragment"
         android:layout_width="match_parent"
         android:layout_height="match_parent" />
 
