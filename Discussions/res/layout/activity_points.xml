@@ -6,7 +6,7 @@
 
     <fragment
         android:id="@+id/fragment_points"
-        android:name="com.TohokuUniversity.discussions.ui.fragments.PointsFragment"
+        android:name="jp.ac.tohoku.qse.takahashi.discussions.ui.fragments.PointsFragment"
         android:layout_width="match_parent"
         android:layout_height="match_parent" >
         <!-- Preview: layout=@layout/fragment_points -->

@@ -6,7 +6,7 @@
 
     <fragment
         android:id="@+id/fragment_topics"
-        android:name="com.TohokuUniversity.discussions.ui.fragments.TopicsListFragment"
+        android:name="jp.ac.tohoku.qse.takahashi.discussions.ui.fragments.TopicsListFragment"
         android:layout_width="match_parent"
         android:layout_height="match_parent" />
 
