@@ -50,11 +50,11 @@ public class SyncStatusUpdaterFragment extends  Fragment implements DetachableRe
 
 		super.onActivityCreated(savedInstanceState);
 
-		createServerDialog();
-		//createProgressDialog();
+		//createServerDialog();
+		createProgressDialog();
 	}
 
-	//*
+	/*
 	private void createServerDialog()
 	{
 		AlertDialog.Builder builder=new AlertDialog.Builder(getActivity());
@@ -123,7 +123,7 @@ public class SyncStatusUpdaterFragment extends  Fragment implements DetachableRe
 		if(mServerAddressDialog!=null)
 			mServerAddressDialog.show();
 	}
-
+	//*/
 	
 	
 	private void createProgressDialog(){

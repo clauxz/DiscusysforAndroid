@@ -9,10 +9,10 @@
     </string-array>
     
     <string-array name="server_names">
-        <item>Local</item>
-        <item>Public</item>
-        <item>Offline</item>
-        <item>Development</item>
+        <item>@string/server_name_local</item>
+        <item>@string/server_name_public</item>
+        <item>@string/server_name_offline</item>
+        <item>@string/server_name_development</item>
     </string-array>
     
 <string-array name="add_attachemt_types">

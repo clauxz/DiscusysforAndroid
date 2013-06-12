@@ -94,4 +94,19 @@ public class PreferenceHelper {
 		editor.putString(PreferenceKey.SERVER_ADDRESS, defaultServer);
 		editor.commit();
 	}
+	
+	public static void setTypedServerAddressFlag(final Context contex, final boolean flag){
+		
+		SharedPreferences prefs=PreferenceManager.getDefaultSharedPreferences(contex);
+		SharedPreferences.Editor editor =prefs.edit();
+		
+		editor.putBoolean(PreferenceKey.IS_SERVER_ADDRESS_TYPED, flag);
+		editor.commit();
+	}
+	
+	public static boolean isTypedServerAddressFlag(final Context contex){
+		SharedPreferences prefs=PreferenceManager.getDefaultSharedPreferences(contex);
+		
+		return prefs.getBoolean(PreferenceKey.IS_SERVER_ADDRESS_TYPED,false);
+	}
 }

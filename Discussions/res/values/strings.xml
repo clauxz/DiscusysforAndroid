@@ -33,11 +33,13 @@
     <string name="dialog_text_confirm_delete">You\'ll lose attached media and comments!</string>
     <string name="dialog_text_youtube_select_video_first">Open video first to use attachment function. </string>
     <string name="dialog_text_sdcard_unmounted">SD Card is not available. </string>
+    <string name="dialog_text_selectip">Select server from list or inter server IP.</string>
     <string name="tab_title_comments">Comments</string>
     <string name="tab_title_description">Description</string>
     <string name="tab_title_media">Media</string>
     <string name="tab_title_source">Source</string>
     <string name="title_settings_server">Server address</string>
+    <string name="dialog_text_selectip">Select server from list or inter server IP.</string>
     <!-- buttons -->
     <string name="button_title_comment">Comment</string>
     <string name="button_title_attach_url">Attach url</string>
@@ -47,6 +49,7 @@
     <string name="button_title_select_attach">Add attachment</string>
     <string name="button_title_go_to_market">Go to market</string>
     <string name="button_title_cancel">Cancel</string>
+    <string name="button_title_ok">OK</string>
     <!-- menus -->
     <string name="menu_action_refresh">Refresh</string>
     <string name="menu_action_delete">Delete</string>
@@ -108,4 +111,8 @@
     <string name="progress_downloading_finished">Finished</string>
     <string name="progress_title_download_database">Loading</string>
 
+    <string name="server_name_local">Local</string>
+    <string name="server_name_public">Public</string>
+    <string name="server_name_offline">Offline</string>
+    <string name="server_name_development">Development</string>
 </resources>

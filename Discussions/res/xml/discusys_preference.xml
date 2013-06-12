@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android" >
 
+    <!-- 
     <ListPreference
         android:defaultValue="@string/local_server_address"
         android:dialogTitle="@string/dialog_title_settings_server"
@@ -9,5 +10,12 @@
         android:key="PREFERENCE_SERVER_ADDRESS"
         android:summary="@string/summary_server_settings"
         android:title="@string/title_settings_server" />
-
+	-->
+	
+	<jp.ac.tohoku.qse.takahashi.discussions.ui.DialogPreferenceSelectIP
+	    android:title="@string/title_settings_server"
+	    android:dialogTitle="@string/dialog_title_settings_server"
+	    android:key="PREFERENCE_SERVER_ADDRESS"
+	    />
+	
 </PreferenceScreen>

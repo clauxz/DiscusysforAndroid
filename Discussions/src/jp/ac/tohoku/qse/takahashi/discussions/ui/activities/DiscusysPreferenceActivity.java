@@ -22,6 +22,8 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.IBinder;
 import android.preference.ListPreference;
+import android.preference.Preference;
+import android.util.Log;
 import android.widget.Toast;
 
 import com.actionbarsherlock.app.SherlockPreferenceActivity;
@@ -60,7 +62,8 @@ public class DiscusysPreferenceActivity extends SherlockPreferenceActivity imple
 	protected ServiceHelper mServiceHelper;
 	private ProgressDialog mProgressDialog;
 	private DetachableResultReceiver mReceiver;
-	private ListPreference mServerAddressListPreference;
+	//private ListPreference mServerAddressListPreference;
+	private Preference mServerAddressPreference;
 	private boolean mSyncing = false;
 	private String resultMessage = null;
 	private int resultProgress;
@@ -136,11 +139,17 @@ public class DiscusysPreferenceActivity extends SherlockPreferenceActivity imple
 		updateDialogView(mSyncing);
 	}
 
+	
 	@Override
 	public void onSharedPreferenceChanged(final SharedPreferences sharedPreferences, final String key) {
 
 		if (PreferenceKey.SERVER_ADDRESS.equals(key)) {
-			mServerAddressListPreference.setSummary(PreferenceHelper.getServerAddress(this));
+			Log.i("Disc pref onChange", String.valueOf(key));
+			Log.i("Disc pref key",String.valueOf(key));
+			
+			//mServerAddressListPreference.setSummary(PreferenceHelper.getServerAddress(this));
+			mServerAddressPreference.setSummary(PreferenceHelper.getServerAddress(this));
+			
 			triggerRefresh();
 		}
 	}
@@ -151,8 +160,11 @@ public class DiscusysPreferenceActivity extends SherlockPreferenceActivity imple
 		setTheme(R.style.Theme_Sherlock_Light);
 		super.onCreate(savedInstanceState);
 		addPreferencesFromResource(R.xml.discusys_preference);
-		mServerAddressListPreference = (ListPreference) getPreferenceScreen().findPreference(
-				PreferenceKey.SERVER_ADDRESS);
+		//mServerAddressListPreference = (ListPreference) getPreferenceScreen().findPreference(
+		//		PreferenceKey.SERVER_ADDRESS);
+		mServerAddressPreference=getPreferenceScreen().findPreference(PreferenceKey.SERVER_ADDRESS);
+		
+		
 		getSupportActionBar().setDisplayShowHomeEnabled(false);
 		getSupportActionBar().setHomeButtonEnabled(false);
 		getSupportActionBar().setDisplayHomeAsUpEnabled(true);
@@ -171,8 +183,10 @@ public class DiscusysPreferenceActivity extends SherlockPreferenceActivity imple
 	protected void onResume() {
 
 		super.onResume();
-		mServerAddressListPreference.setSummary(PreferenceHelper.getServerAddress(this));
+		//mServerAddressListPreference.setSummary(PreferenceHelper.getServerAddress(this));
+		mServerAddressPreference.setSummary(PreferenceHelper.getServerAddress(this));
 		getPreferenceScreen().getSharedPreferences().registerOnSharedPreferenceChangeListener(this);
+		
 	}
 
 	@Override
