@@ -144,9 +144,6 @@ public class DiscusysPreferenceActivity extends SherlockPreferenceActivity imple
 	public void onSharedPreferenceChanged(final SharedPreferences sharedPreferences, final String key) {
 
 		if (PreferenceKey.SERVER_ADDRESS.equals(key)) {
-			Log.i("Disc pref onChange", String.valueOf(key));
-			Log.i("Disc pref key",String.valueOf(key));
-			
 			//mServerAddressListPreference.setSummary(PreferenceHelper.getServerAddress(this));
 			mServerAddressPreference.setSummary(PreferenceHelper.getServerAddress(this));
 			

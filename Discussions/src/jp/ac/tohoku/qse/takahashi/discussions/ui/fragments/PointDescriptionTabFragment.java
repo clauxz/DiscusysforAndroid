@@ -198,7 +198,9 @@ public class PointDescriptionTabFragment extends SherlockFragment {
 	public void onCreate(final Bundle savedInstanceState) {
 
 		super.onCreate(savedInstanceState);
+		
 		logd("[onCreate] savedInstanceState is null: " + (savedInstanceState == null));
+		
 		if (savedInstanceState != null) {
 			populateFromSavedInstanceState(savedInstanceState);
 		}
@@ -272,6 +274,8 @@ public class PointDescriptionTabFragment extends SherlockFragment {
 		selectedPoint.setPersonId(mPersonId);
 		selectedPoint.setPointId(mPointId);
 		selectedPoint.setTopicId(mTopicId);
+		
+		
 		return selectedPoint;
 	}
 

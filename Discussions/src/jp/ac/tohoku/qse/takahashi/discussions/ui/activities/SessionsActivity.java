@@ -133,6 +133,8 @@ public class SessionsActivity extends BaseActivity implements OnDownloadComplete
 
 		Intent intent = new Intent(Intent.ACTION_VIEW, Seats.CONTENT_URI);
 		intent.putExtra(ExtraKey.SESSION_ID, sessionIdPending);
+		
+		
 		startActivity(intent);
 	}
 }

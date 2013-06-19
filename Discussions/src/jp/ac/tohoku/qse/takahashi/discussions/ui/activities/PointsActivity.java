@@ -49,10 +49,12 @@ public class PointsActivity extends BaseActivity implements PhotonServiceCallbac
 	private int mPersonId;
 	private String mPersonName;
 	private int mTopicId;
+	private int mSessionId;
 	private ViewPager pager;
 	PagerTitleStrip pagerTitleStrip;
 	private SyncStatusUpdaterFragment mSyncStatusUpdaterFragment;
 
+	private boolean showExtMenu;
 	@Override
 	public void onArgPointChanged(final ArgPointChanged argPointChanged) {
 
@@ -81,7 +83,17 @@ public class PointsActivity extends BaseActivity implements PhotonServiceCallbac
 	public boolean onCreateOptionsMenu(final com.actionbarsherlock.view.Menu menu) {
 
 		MenuInflater menuInflater = getSupportMenuInflater();
-		menuInflater.inflate(R.menu.actionbar_points, menu);
+		if(this.showExtMenu==true)
+		{
+			menuInflater.inflate(R.menu.actionbar_points_ext, menu);
+		}
+		else
+		{
+			menuInflater.inflate(R.menu.actionbar_points, menu);
+		}
+		
+		//Log.i("Disc","onCreate option menu");
+		
 		// Calling super after populating the menu is necessary here to ensure that the
 		// action bar helpers have a chance to handle this event.
 		return super.onCreateOptionsMenu(menu);
@@ -133,6 +145,9 @@ public class PointsActivity extends BaseActivity implements PhotonServiceCallbac
 				return true;
 			case R.id.menu_discussion_info:
 				startDiscussionInfoActivity();
+				return true;
+			case R.id.menu_discussion_report:
+				startDiscussionTopicReport();
 				return true;
 			default:
 				return super.onOptionsItemSelected(item);
@@ -206,6 +221,7 @@ public class PointsActivity extends BaseActivity implements PhotonServiceCallbac
 
 	private void initFromIntentExtra() {
 
+		
 		if (!getIntent().hasExtra(ExtraKey.PERSON_ID)) {
 			throw new IllegalStateException("Activity intent was without person id");
 		}
@@ -218,9 +234,30 @@ public class PointsActivity extends BaseActivity implements PhotonServiceCallbac
 		if (!getIntent().hasExtra(ExtraKey.PERSON_NAME)) {
 			throw new IllegalStateException("Activity intent was without person name");
 		}
+		if(getIntent().hasExtra(ExtraKey.SESSION_ID)
+				&& getIntent().getExtras().getInt(ExtraKey.SESSION_ID)!=0) // zore session is not exist ( not experiment mode)
+		{
+			this.showExtMenu=true;
+			mSessionId=getIntent().getExtras().getInt(ExtraKey.SESSION_ID);
+			Log.v("Discussions","[Session ID] exists");
+		}
+		else
+		{
+			this.showExtMenu=false;
+			mSessionId=Integer.MIN_VALUE;
+			Log.v("Discussions","[Session ID] not exists");
+		}
+		
 		mPersonName = getIntent().getExtras().getString(ExtraKey.PERSON_NAME);
 		mPersonId = getIntent().getExtras().getInt(ExtraKey.PERSON_ID);
 		mTopicId = getIntent().getExtras().getInt(ExtraKey.TOPIC_ID);
+		
+		
+		
+		
+		//Log.i("Disc","onCreate");
+		
+		
 		if (mTopicId == -1) {
 			throw new IllegalStateException("Activity intent has illegal topic id -1");
 		}
@@ -240,6 +277,26 @@ public class PointsActivity extends BaseActivity implements PhotonServiceCallbac
 		startActivity(discussionInfoIntent);
 	}
 
+	/**
+	 * Start report activity. 
+	 */
+	private void startDiscussionTopicReport(){
+		int discussionId = getIntent().getExtras().getInt(ExtraKey.DISCUSSION_ID, 0);
+		int topicId = getIntent().getExtras().getInt(ExtraKey.TOPIC_ID);
+		int sessionId=getIntent().getExtras().getInt(ExtraKey.SESSION_ID);
+		
+		
+		Intent intent=new Intent(this, WebReportViewActivity.class);
+		Bundle bundle=new Bundle();
+		bundle.putInt(ExtraKey.DISCUSSION_ID, discussionId);
+		bundle.putInt(ExtraKey.TOPIC_ID, topicId);
+		bundle.putInt(ExtraKey.SESSION_ID, sessionId);
+		intent.putExtras(bundle);
+		
+		startActivity(intent);
+	}
+	
+	
 	private class PersonsCursorLoader implements LoaderManager.LoaderCallbacks<Cursor> {
 
 		private static final int LOADER_TOPIC_PERSONS = 1;

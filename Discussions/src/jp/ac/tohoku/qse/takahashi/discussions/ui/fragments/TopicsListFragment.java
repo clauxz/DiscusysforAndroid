@@ -97,11 +97,13 @@ public class TopicsListFragment extends BaseListFragment {
 		int personColor = extras.getInt(ExtraKey.PERSON_COLOR, Integer.MIN_VALUE);
 		String personName = extras.getString(ExtraKey.PERSON_NAME);
 		int discussionId = extras.getInt(ExtraKey.DISCUSSION_ID, Integer.MIN_VALUE);
+		int sessionid=extras.getInt(ExtraKey.SESSION_ID);
 		intent.putExtra(ExtraKey.PERSON_ID, personId);
 		intent.putExtra(ExtraKey.PERSON_COLOR, personColor);
 		intent.putExtra(ExtraKey.PERSON_NAME, personName);
 		intent.putExtra(ExtraKey.DISCUSSION_ID, discussionId);
 		intent.putExtra(ExtraKey.TOPIC_ID, pointId);
+		intent.putExtra(ExtraKey.SESSION_ID, sessionid);
 		return intent;
 	}
 }

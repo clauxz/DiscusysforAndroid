@@ -94,11 +94,15 @@ public class DiscussionsListFragment extends BaseListFragment {
 		Intent intent = new Intent(Intent.ACTION_VIEW, uri);
 		int personId = extras.getInt(ExtraKey.PERSON_ID, Integer.MIN_VALUE);
 		int personColor = extras.getInt(ExtraKey.PERSON_COLOR, Integer.MIN_VALUE);
+		int sessionId=extras.getInt(ExtraKey.SESSION_ID);
 		String personName = extras.getString(ExtraKey.PERSON_NAME);
+		
 		intent.putExtra(ExtraKey.PERSON_ID, personId);
 		intent.putExtra(ExtraKey.PERSON_COLOR, personColor);
 		intent.putExtra(ExtraKey.PERSON_NAME, personName);
 		intent.putExtra(ExtraKey.DISCUSSION_ID, discussionId);
+		intent.putExtra(ExtraKey.SESSION_ID,sessionId);
+				
 		return intent;
 	}
 }

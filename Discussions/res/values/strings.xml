@@ -15,6 +15,7 @@
     <string name="activity_title_sessions">Sessions</string>
     <string name="activity_title_seats">Seats</string>
     <string name="activity_title_webview">Select url</string>
+    <string name="activity_title_webview_report">Report</string>
     <string name="activity_title_youtube">Select youtube video</string>
     <string name="activity_title_preferences">Preferences</string>
     <string name="activity_title_comment">Comment</string>
@@ -60,6 +61,7 @@
     <string name="menu_action_new_attachment">Save link</string>
     <string name="menu_action_view_discussion_info">Info</string>
     <string name="menu_action_settings">Settings</string>
+    <string name="menu_action_view_report">Report</string>
     <!-- texts -->
     <string name="text_empty_list">Empty list</string>
     <string name="text_empty_persons_list">No persons</string>
