@@ -179,6 +179,7 @@ public class PointMediaTabFragment extends SherlockFragment implements OnClickLi
 
 		switch (item.getItemId()) {
 			case R.id.menu_delete_attachements:
+				//Log.i("Disc","delete attachements");
 				onActionDeleteAttachment(item);
 				return true;
 			default:

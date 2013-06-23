@@ -7,6 +7,7 @@ import jp.ac.tohoku.qse.takahashi.discussions.data.odata.OdataWriteClient;
 import jp.ac.tohoku.qse.takahashi.discussions.data.provider.DiscussionsContract.Attachments;
 import jp.ac.tohoku.qse.takahashi.discussions.data.provider.DiscussionsContract.Comments;
 import jp.ac.tohoku.qse.takahashi.discussions.data.provider.DiscussionsContract.Points;
+import jp.ac.tohoku.qse.takahashi.discussions.data.provider.DiscussionsContract.Sources;
 import jp.ac.tohoku.qse.takahashi.discussions.photon.PhotonHelper;
 import jp.ac.tohoku.qse.takahashi.discussions.photon.constants.StatsEvent;
 import jp.ac.tohoku.qse.takahashi.discussions.ui.IntentAction;
@@ -24,8 +25,9 @@ import android.util.Log;
 /** Background {@link Service} that synchronizes data living in {@link ScheduleProvider}. */
 public class DeleteService extends IntentService {
 
-	public static final int TYPE_DELETE_ATTACHMENT = 0x2;
-	public static final int TYPE_DELETE_COMMENT = 0x1;
+	public static final int TYPE_DELETE_ATTACHMENT = 0x3;
+	public static final int TYPE_DELETE_COMMENT = 0x2;
+	public static final int TYPE_DELETE_URL=0x1;
 	public static final int TYPE_DELETE_POINT = 0x0;
 	private static final boolean DEBUG = true && ApplicationConstants.LOGD_SERVICE;
 	private static final String TAG = DeleteService.class.getSimpleName();
@@ -123,6 +125,9 @@ public class DeleteService extends IntentService {
 				case TYPE_DELETE_ATTACHMENT:
 					deleteAttachment(intent);
 					break;
+				case TYPE_DELETE_URL:
+					deleteUrl(intent);
+					break;
 				default:
 					throw new IllegalArgumentException("Illegal type id: " + getTypeFromExtra(intent));
 			}
@@ -136,6 +141,19 @@ public class DeleteService extends IntentService {
 		logd("[onHandleIntent] delete service finished");
 	}
 
+	private void deleteUrl(final Intent intent){
+		int urlid=getValueIdFromExtra(intent);
+		logd("[deleteAttacheURL] id:"+urlid);
+		OdataWriteClient odataWrite=new OdataWriteClient(this);
+		odataWrite.deleteUrl(urlid);
+		SelectedPoint selectedPoint=getSelectedPointFromExtra(intent);
+		ResultReceiver photonReceiver = getPhotonReceiverFromExtra(intent);
+		PhotonHelper.sendArgPointUpdated(selectedPoint, photonReceiver);
+		PhotonHelper.sendStatsEvent(StatsEvent.URL_REMOVED, selectedPoint, photonReceiver);
+		String where=Sources.Columns.ID+"=?";
+		String[] args=new String[]{String.valueOf(urlid)};
+		getContentResolver().delete(Sources.CONTENT_URI, where, args);
+	}
 	private void deleteAttachment(final Intent intent) {
 
 		int attachmentId = getValueIdFromExtra(intent);
@@ -151,6 +169,7 @@ public class DeleteService extends IntentService {
 		getContentResolver().delete(Attachments.CONTENT_URI, where, args);
 	}
 
+	
 	private void deleteComment(final Intent intent) {
 
 		int commentId = getValueIdFromExtra(intent);

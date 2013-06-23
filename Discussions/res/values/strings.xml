@@ -28,6 +28,7 @@
     <string name="dialog_title_settings_server">Server url</string>
     <string name="dialog_title_attach">Attach</string>
     <string name="dialog_title_delete_point">Delete point?</string>
+    <string name="dialog_title_delete_url">Delete URL?</string>
     <string name="dialog_text_file_explorer_need_install_first">Install file explorer application first to use attachment function. </string>
     <string name="dialog_text_pdf_viewer_need_install_first">Install pdf viewer application first to see pdf preview. </string>
     <string name="dialog_text_camera_need_install_first">Install camera application first to use attachment function. </string>

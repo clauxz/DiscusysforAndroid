@@ -3,7 +3,7 @@
     package="jp.ac.tohoku.qse.takahashi.discussions"
     android:installLocation="auto"
     android:versionCode="50"
-    android:versionName="0.1.67" >
+    android:versionName="0.1.68" >
 
     <uses-sdk
         android:minSdkVersion="8"

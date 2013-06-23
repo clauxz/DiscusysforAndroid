@@ -23,6 +23,7 @@ public class StatsEvent {
 	public static final int LINK_CREATED = 11;
 	public static final int LINK_REMOVED = 12;
 	public static final int MEDIA_REMOVED = 28;
+	public static final int URL_REMOVED=31;
 	public static final int PDF_ADDED = 24;
 	public static final int PDF_URL_ADDED = 25;
 	public static final int RECORDIND_STARTED = 0;

@@ -20,9 +20,9 @@
         android:layout_height="wrap_content"
         android:layout_gravity="center_vertical"
         android:layout_margin="4dip"
-        android:autoLink="web"
+        android:textColor="#33b5e5"
         android:ellipsize="end"
         android:maxLines="2"
         android:textAppearance="?android:attr/textAppearanceLarge" />
-
+	<!--android:autoLink="web"-->
 </LinearLayout>

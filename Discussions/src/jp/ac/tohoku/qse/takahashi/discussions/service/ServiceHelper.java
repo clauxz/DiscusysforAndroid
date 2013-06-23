@@ -49,6 +49,17 @@ public class ServiceHelper {
 		intent.putExtra(ServiceExtraKeys.PHOTON_RECEIVER, mPhotonController.getResultReceiver());
 		mContext.startService(intent);
 	}
+	
+	
+	public void deleteAttachedURL(final int urlId,final SelectedPoint selectedPoint){
+		Intent intent=new Intent(IntentAction.DELETE);
+		intent.putExtra(ServiceExtraKeys.TYPE_ID, DeleteService.TYPE_DELETE_URL);
+		intent.putExtra(ServiceExtraKeys.VALUE_ID, urlId);
+		intent.putExtra(ServiceExtraKeys.SELECTED_POINT, selectedPoint);
+		intent.putExtra(ServiceExtraKeys.ACTIVITY_RECEIVER, mActivityReceiver);
+		intent.putExtra(ServiceExtraKeys.PHOTON_RECEIVER, mPhotonController.getResultReceiver());
+		mContext.startService(intent);
+	}
 
 	public void deleteComment(final int commentId, final SelectedPoint selectedPoint) {
 

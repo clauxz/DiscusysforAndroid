@@ -4,6 +4,7 @@ import jp.ac.tohoku.qse.takahashi.discussions.ApplicationConstants;
 import jp.ac.tohoku.qse.takahashi.discussions.data.model.Description;
 import jp.ac.tohoku.qse.takahashi.discussions.data.model.SelectedPoint;
 import jp.ac.tohoku.qse.takahashi.discussions.data.model.Source;
+import jp.ac.tohoku.qse.takahashi.discussions.data.provider.DiscussionsContract.Comments;
 import jp.ac.tohoku.qse.takahashi.discussions.data.provider.DiscussionsContract.Descriptions;
 import jp.ac.tohoku.qse.takahashi.discussions.data.provider.DiscussionsContract.Points;
 import jp.ac.tohoku.qse.takahashi.discussions.data.provider.DiscussionsContract.Sources;
@@ -15,6 +16,10 @@ import jp.ac.tohoku.qse.takahashi.discussions.utils.TextViewUtils;
 import jp.ac.tohoku.qse.takahashi.discussions.R;
 
 import android.app.Activity;
+import android.app.AlertDialog;
+import android.app.Dialog;
+import android.app.AlertDialog.Builder;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.database.Cursor;
 import android.net.Uri;
@@ -32,13 +37,19 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
+import android.widget.AdapterView.AdapterContextMenuInfo;
 import android.widget.AdapterView.OnItemClickListener;
+import android.widget.AdapterView.OnItemLongClickListener;
 import android.widget.ListView;
 import android.widget.TextView;
 
 import com.actionbarsherlock.app.SherlockFragment;
 
-public class PointSourcesTabFragment extends SherlockFragment implements OnItemClickListener, OnClickListener {
+public class PointSourcesTabFragment extends SherlockFragment implements 
+	OnItemClickListener,
+	OnItemLongClickListener,
+	OnClickListener 
+{
 
 	private static final boolean DEBUG = true && ApplicationConstants.DEV_MODE;
 	private static final int PICK_URL_REQUEST = 0x01;
@@ -52,6 +63,8 @@ public class PointSourcesTabFragment extends SherlockFragment implements OnItemC
 	private ListView mSourcesList;
 	private String mDescriptionLink;
 
+	private int mPositionClick;
+	private boolean isDeleteDialogShow=false;
 	public PointSourcesTabFragment() {
 
 		mSourcesCursorLoader = new SourcesCursorLoader();
@@ -136,7 +149,6 @@ public class PointSourcesTabFragment extends SherlockFragment implements OnItemC
 
 	@Override
 	public void onClick(final View v) {
-
 		switch (v.getId()) {
 			case R.id.btn_attach_url:
 				ActivityHelper.startSearchWebActivityForResult(getActivity(), TextViewUtils
@@ -146,19 +158,98 @@ public class PointSourcesTabFragment extends SherlockFragment implements OnItemC
 				break;
 		}
 	}
-
+	
+	
 	@Override
-	public void onItemClick(final AdapterView<?> parent, final View view, final int position, final long id) {
+	public void onItemClick(final AdapterView<?> parent, 
+			final View view, final int position, final long id) {
 
+		Log.i("Disc","DIALOG:"+String.valueOf(isDeleteDialogShow=true));
+		
+		//if(isDeleteDialogShow)//block onClick event if onLoncgEvent shows delete URL dialog
+		{
+			TextView linkTextView = (TextView) view.findViewById(R.id.text_source_link);
+			CharSequence urlSequence = linkTextView.getText();
+			if (!TextUtils.isEmpty(urlSequence)) {
+				Uri uri = Uri.parse(urlSequence.toString());
+				Intent intent = new Intent(Intent.ACTION_VIEW, uri);
+				
+				startActivity(intent);
+			}
+		}
+	}
+	
+	/**
+	 * Delete URL reaction
+	 */
+	@Override
+	public boolean onItemLongClick(AdapterView<?> parent, 
+			final View view, final int position,final long id) 
+	{
+		isDeleteDialogShow=true;
+		
 		TextView linkTextView = (TextView) view.findViewById(R.id.text_source_link);
 		CharSequence urlSequence = linkTextView.getText();
 		if (!TextUtils.isEmpty(urlSequence)) {
 			Uri uri = Uri.parse(urlSequence.toString());
-			Intent intent = new Intent(Intent.ACTION_VIEW, uri);
-			startActivity(intent);
+			//Intent intent = new Intent(Intent.ACTION_VIEW, uri);
+			//Log.i("Disc url",String.valueOf(uri.toString()));
+			mPositionClick=position-1;
+			showDeleteUrlDialog(uri);
+		}
+		
+		return true;
+	}
+	
+	private void showDeleteUrlDialog(final Uri uri){
+		
+		AlertDialog.Builder builder=new Builder(getActivity());
+		builder.setTitle(R.string.dialog_title_delete_url);
+		builder.setPositiveButton(R.string.button_title_ok, new DialogInterface.OnClickListener() {
+			
+			@Override
+			public void onClick(DialogInterface dialog, int which) {
+				//Log.i("Disc","delete url OK");
+				//String id=Sources.getValueId(uri);
+				//Log.i("Disc","ID:"+String.valueOf(id));
+				isDeleteDialogShow=false;
+				deleteUrl();//id);
+				
+			}
+		});
+		builder.setNegativeButton(R.string.button_title_cancel, new DialogInterface.OnClickListener() {
+			
+			@Override
+			public void onClick(DialogInterface dialog, int which) {
+				// TODO Auto-generated method stub
+				//Log.i("Disc","detele url CANCEL");
+				isDeleteDialogShow=false;
+			}
+		});
+		
+		builder.setMessage(uri.toString());
+		
+		
+		Dialog dialog=builder.create();
+		dialog.show();
+		
+	}
+	
+	
+	private void deleteUrl(){
+		
+		if(mPositionClick<mSourcesAdapter.getCount())
+		{
+			Cursor cursor=mSourcesAdapter.getCursor();
+			cursor.moveToPosition(mPositionClick);
+			int posColId=cursor.getColumnIndexOrThrow(Sources.Columns.ID);
+			int urlId = cursor.getInt(posColId);
+			
+			((BaseActivity)getActivity()).getServiceHelper().deleteAttachedURL(urlId, mSelectedPoint);
 		}
 	}
 
+	
 	public void onServiceConnected() {
 
 		if (mDescriptionLink != null) {
@@ -228,6 +319,7 @@ public class PointSourcesTabFragment extends SherlockFragment implements OnItemC
 			mSourcesList.setAdapter(mSourcesAdapter);
 		}
 		mSourcesList.setOnItemClickListener(this);
+		mSourcesList.setOnItemLongClickListener(this);
 	}
 
 	private void initSourcesLoader() {
@@ -350,4 +442,6 @@ public class PointSourcesTabFragment extends SherlockFragment implements OnItemC
 			Log.d(TAG, message);
 		}
 	}
+
+	
 }

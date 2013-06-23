@@ -41,6 +41,15 @@ public class OdataWriteClient extends BaseOdataClient {
 		HttpUtil.insertPersonTopic(context, personId, topicId);
 	}
 
+	/**
+	 * Delete URL attached to point. 
+	 * @param urlId ID in table of the row.
+	 */
+	public void deleteUrl(final int urlId){
+		
+		mConsumer.deleteEntity(Sources.TABLE_NAME,urlId).execute();
+	}
+	
 	public void deleteAttachment(final int attachmentId) {
 
 		mConsumer.deleteEntity(Attachments.TABLE_NAME, attachmentId).execute();
