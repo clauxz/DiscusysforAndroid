@@ -9,9 +9,13 @@ import jp.ac.tohoku.qse.takahashi.discussions.data.PreferenceHelper;
 import jp.ac.tohoku.qse.takahashi.discussions.ui.ExtraKey;
 import android.content.Context;
 import android.content.res.Configuration;
+import android.graphics.Bitmap;
 import android.os.Bundle;
+import android.text.method.HideReturnsTransformationMethod;
 import android.util.Log;
+import android.view.inputmethod.InputMethodManager;
 import android.webkit.WebView;
+import android.webkit.WebViewClient;
 import android.widget.EditText;
 
 /**
@@ -30,7 +34,9 @@ public class WebReportViewActivity extends BaseActivity {
 	
 	private WebView mWebView;
 	private EditText mEditText;
+	private MenuItem mMenuItem;
 	
+	private Bundle savedState;
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -38,20 +44,73 @@ public class WebReportViewActivity extends BaseActivity {
 		initFormExtra();
 		setContentView(R.layout.activity_webview);
 		mWebView = (WebView) findViewById(R.id.webview);
-		mEditText = (EditText) findViewById(R.id.edittext_url);
+		
+		mWebView.setWebViewClient(new WebViewClient()
+		{
+			@Override
+			public void onPageStarted(WebView view, String url, Bitmap favicon) {
+				if(mMenuItem!=null){
+					Log.i("Disc","show progressbar URL:   "+String.valueOf(url));
+					mMenuItem.setVisible(true);
+				}
+				super.onPageStarted(view, url, favicon);
+			}
+			
+			@Override
+			public void onPageFinished(WebView view, String url) {
+				if(mMenuItem!=null){
+					Log.i("Disc","hide progressbar URL:   "+String.valueOf(url));
+					mMenuItem.setVisible(false);//hide progress bar 
+				}
+				super.onPageFinished(view, url);
+			}
+		});
+		//mWebView.getSettings().setLoadWithOverviewMode(true);
+		//mWebView.getSettings().setUseWideViewPort(true);
+		mWebView.getSettings().setBuiltInZoomControls(true);
 		
 		if (isTablet(this)) {
 			mWebView.getSettings().setUserAgentString(
 					"Mozilla/5.0 AppleWebKit/533.1 (KHTML, like Gecko) Version/4.0 Mobile Safari/533.1");
 		}
 		
+		if(savedInstanceState!=null)
+		{
+			Log.i("Disc restore",String.valueOf(savedInstanceState));
+			this.savedState=savedInstanceState;
+			mWebView.restoreState(savedInstanceState);
+		}
+		else
+		{
+			this.savedState=null;
+			
+		}
+		
+		mEditText = (EditText) findViewById(R.id.edittext_url);
+		mWebView.requestFocus();
+		
+		InputMethodManager imm = (InputMethodManager) getSystemService(
+			    INPUT_METHOD_SERVICE);
+		imm.hideSoftInputFromWindow(getCurrentFocus().getWindowToken(), 0);
+		
 	}
 
+	@Override
+	public void onConfigurationChanged(Configuration newConfig) {
+		super.onConfigurationChanged(newConfig);
+	}
+	
+	@Override
+	protected void onSaveInstanceState(Bundle outState) {
+		mWebView.saveState(outState);
+		super.onSaveInstanceState(outState);
+	}
 	@Override
 	protected void onResume() {
 
 		super.onResume();
-		buildUrl();
+		if(this.savedState==null)
+			buildUrl();
 	}
 	/**
 	 * Detect Discussion and topic IDs.
@@ -71,6 +130,7 @@ public class WebReportViewActivity extends BaseActivity {
 		int topicId = getIntent().getExtras().getInt(ExtraKey.TOPIC_ID);
 		int sessionId=getIntent().getExtras().getInt(ExtraKey.SESSION_ID);
 		
+		//url sample
 		//http://192.170.1.222/discsvc/report?discussionId=1&topicId=1&sessionId=1
 		String server=PreferenceHelper.getServerAddress(this);
 		
@@ -88,6 +148,12 @@ public class WebReportViewActivity extends BaseActivity {
 		mEditText.setText(url);
 		mWebView.setFocusable(true);
 		mWebView.loadUrl(url);
+		
+		if(mMenuItem!=null)
+		{
+			Log.i("Disc","mMenuItem visible=true; buildUrl");
+			mMenuItem.setVisible(true);
+		}
 	}
 
 
@@ -100,7 +166,6 @@ public class WebReportViewActivity extends BaseActivity {
 	
 	@Override
 	protected void onControlServiceConnected() {
-		// TODO Auto-generated method stub
 		
 	}
 	
@@ -108,6 +173,9 @@ public class WebReportViewActivity extends BaseActivity {
 	public boolean onCreateOptionsMenu(final com.actionbarsherlock.view.Menu  menu) {
 		MenuInflater menuInflater = getSupportMenuInflater();
 		menuInflater.inflate(R.menu.actionbar_refresh, menu);
+		mMenuItem=menu.findItem(R.id.menu_refresh_progressbar);
+		if(mMenuItem!=null)
+			mMenuItem.setVisible(false);
 		return super.onCreateOptionsMenu(menu);
 	}
 	
@@ -120,6 +188,7 @@ public class WebReportViewActivity extends BaseActivity {
 			{
 				String url=mEditText.getText().toString();
 				mWebView.loadUrl(url);
+				Log.i("Dsc","URL: "+String.valueOf(url));				
 			}
 			break;
 		}

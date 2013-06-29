@@ -4,6 +4,7 @@
     android:layout_height="match_parent"
     android:orientation="vertical" >
 
+    
     <fragment
         android:id="@+id/fragment_points"
         android:name="jp.ac.tohoku.qse.takahashi.discussions.ui.fragments.PointsFragment"

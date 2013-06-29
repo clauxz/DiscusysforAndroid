@@ -132,10 +132,12 @@
                 <data android:mimeType="vnd.android.cursor.dir/vnd.discussions.point" />
             </intent-filter>
         </activity>
+        
+        <!--PointDetailsActivity-->
         <activity
             android:name="jp.ac.tohoku.qse.takahashi.discussions.ui.activities.PointDetailsActivity"
             android:label="@string/activity_title_point"
-            android:launchMode="singleTop"
+
             android:windowSoftInputMode="adjustResize" >
             <intent-filter>
                 <action android:name="android.intent.action.VIEW" />
@@ -171,6 +173,7 @@
 		<activity
 		    android:name="jp.ac.tohoku.qse.takahashi.discussions.ui.activities.WebReportViewActivity"
 		    android:label="@string/activity_title_webview_report"
+		    android:configChanges="orientation|screenSize"
 		    />
 		    
         

@@ -194,6 +194,7 @@ public class PointMediaTabFragment extends SherlockFragment implements OnClickLi
 		if (Activity.RESULT_OK == resultCode) {
 			switch (requestCode) {
 				case PICK_CAMERA_PHOTO:
+					Log.i("Disc","onResult camera");
 					handleCameraResult(data);
 					break;
 				case PICK_IMAGE_REQUEST:
@@ -380,9 +381,12 @@ public class PointMediaTabFragment extends SherlockFragment implements OnClickLi
 		logd("[onServiceConnected] new attachemtn null: " + (newAttachment == null));
 		if (newAttachment != null) {
 			logd("[onServiceConnected] new attachemtn type: " + newAttachment.type);
-			logd("[onServiceConnected] new attachemtn uri: " + newAttachment.uri.toString());
+			logd("[onServiceConnected] new attachemtn uri: " + String.valueOf( newAttachment.uri) );
+			//logd("[onServiceConnected] new attachemtn uri: " + newAttachment.uri.toString() );
+			
 			switch (newAttachment.type) {
 				case PICK_CAMERA_PHOTO:
+					Log.i("Disc","attache photos");
 					onAttachSourceAdded(newAttachment.uri, Attachments.AttachmentType.JPG);
 					break;
 				case PICK_IMAGE_REQUEST:
@@ -417,13 +421,21 @@ public class PointMediaTabFragment extends SherlockFragment implements OnClickLi
 
 	private void handleCameraResult(final Intent data) {
 
-		if (data == null) {
+		if (data == null) 
+		{
 			newAttachment = new NewAttachment(PICK_CAMERA_PHOTO, tempCameraFileUri);
+			
+			Log.i("Disc handleCameraResult","data:"+String.valueOf(tempCameraFileUri));
+			
 			if (((BaseActivity) getActivity()).isBound()) {
 				onServiceConnected();
 			}
-		} else if (data.getData() != null) {
+		} else if (data.getData() != null) 
+		{
 			newAttachment = new NewAttachment(PICK_CAMERA_PHOTO, data.getData());
+			
+			Log.i("Disc handleCameraResult","data.getData()"+String.valueOf(tempCameraFileUri));
+			
 			if (((BaseActivity) getActivity()).isBound()) {
 				onServiceConnected();
 			}
@@ -451,6 +463,8 @@ public class PointMediaTabFragment extends SherlockFragment implements OnClickLi
 
 	private void onAttachSourceAdded(final Uri uri, final int attachmentType) {
 
+		Log.i("Disc","URL:"+String.valueOf(uri));
+		
 		onAttachSourceAdded(uri, attachmentType, "");
 	}
 
@@ -515,7 +529,7 @@ public class PointMediaTabFragment extends SherlockFragment implements OnClickLi
 	}
 
 	private void requestCameraPhoto(final Activity activity) {
-
+		
 		Intent cameraIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
 		if (!isIntentAvailable(cameraIntent)) {
 			showCameraNeedToBeInstalledDialog();
@@ -538,7 +552,8 @@ public class PointMediaTabFragment extends SherlockFragment implements OnClickLi
 		values.put("_data", filePathString);
 		tempCameraFileUri = activity.getContentResolver().insert(Media.EXTERNAL_CONTENT_URI, values);
 		cameraIntent.putExtra(MediaStore.EXTRA_OUTPUT, tempCameraFileUri);
-		activity.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_NOSENSOR);
+		activity.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_SENSOR);
+		//activity.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_NOSENSOR);
 		activity.startActivityForResult(cameraIntent, PICK_CAMERA_PHOTO);
 	}
 

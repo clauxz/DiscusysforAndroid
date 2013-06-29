@@ -2,10 +2,10 @@
 <resources>
 
     <string name="public_server_address">123.108.5.24</string>
-    <string name="offline_server_address">192.168.167.1</string>
+    <string name="offline_server_address">192.168.56.50</string>
     <string name="public_database_address">tcp:123.108.5.24,8080</string>
-    <string name="offline_database_address">tcp:192.168.167.1,8080</string>
-    
+    <string name="offline_database_address">tcp:192.168.56.50,8080</string>
+    <!--  old offline server IP 192.168.167.1 -->
     <!-- Original servers -->
     <string name="local_server_address">10.32.194.179</string>
     <string name="local_database_address">tcp:10.32.194.179,8080</string>
