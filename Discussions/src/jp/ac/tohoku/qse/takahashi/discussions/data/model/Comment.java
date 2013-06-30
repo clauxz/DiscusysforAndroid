@@ -29,6 +29,30 @@ public class Comment implements Value {
 		pointId = commentBundle.getInt(Comments.Columns.POINT_ID, Integer.MIN_VALUE);
 	}
 
+	/**
+	 * Constructor used only for WPF client bug fix.
+	 * Constructor used for insertion comment placeholder. WPF client require placeholder in comment 
+	 * table with <b>PERRSONID=NULL</b> 
+	 * When developer will remove functions with WPFCork prefix he will remove such constructor.
+	 * </br>
+	 * <b style="color:red;">Don't use constructor outside functions with WPFCork prefix.</b>
+	 * @param commentBundle
+	 * @param IsSetPersoID
+	 */
+	public Comment(final Bundle commentBundle,final boolean IsSetPersonID) {
+
+		id = commentBundle.getInt(Comments.Columns.ID, Integer.MIN_VALUE);
+		text = commentBundle.getString(Comments.Columns.TEXT);
+		
+		if(IsSetPersonID)
+			personId = commentBundle.getInt(Comments.Columns.PERSON_ID, Integer.MIN_VALUE);
+		else
+			personId=null;
+		
+		pointId = commentBundle.getInt(Comments.Columns.POINT_ID, Integer.MIN_VALUE);
+	}
+	
+	
 	public Comment(final Cursor cursor) {
 
 		super();
@@ -84,7 +108,27 @@ public class Comment implements Value {
 		cv.put(Comments.Columns.POINT_ID, pointId);
 		return cv;
 	}
+	
 
+	/**
+	 * Alternative of the <b>toContentValues()</b> function.
+	 * Used only in functions with WPFCork prefix.
+	 * </br>
+	 * Return {@link ContentValues} without <b>PERSOID</b>
+	 * </br>
+	 * <b style="color:red;">Don't use constructor outside functions with WPFCork prefix.</b>
+	 * @return {@Link ContentValues}
+	 */
+	public ContentValues WPFCork_toContentValues() {
+
+		ContentValues cv = new ContentValues();
+		cv.put(Comments.Columns.ID, id);
+		cv.put(Comments.Columns.TEXT, text);
+		//cv.put(Comments.Columns.PERSON_ID, personId);
+		cv.put(Comments.Columns.POINT_ID, pointId);
+		return cv;
+	}
+	
 	@Override
 	public String toMyString() {
 

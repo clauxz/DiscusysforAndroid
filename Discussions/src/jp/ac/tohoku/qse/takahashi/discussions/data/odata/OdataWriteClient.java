@@ -110,6 +110,30 @@ public class OdataWriteClient extends BaseOdataClient {
 		// @formatter:on
 	}
 
+	/**
+	 * Used for insert comment without PERSONID.
+	 * </br>
+	 * Comment without personid used by WPF client as placeholder.
+	 * When WPF will be fixed need to remove code.
+	 * </br>
+	 * <b style="color:red;">Don't use constructor outside functions with WPFCork prefix.</b>
+	 * @param comment
+	 * @return
+	 */
+	public OEntity WPFCork_insertComment(final Comment comment) {
+
+		deleteNullCommentAtPoint(comment.getPointId());
+		
+		//.link(Comments.Columns.PERSON_ID, OEntityKey.parse(String.valueOf(comment.getPersonId())))
+		
+		// @formatter:off
+		return mConsumer.createEntity(Comments.TABLE_NAME)
+				.link("ArgPoint", OEntityKey.parse(String.valueOf(comment.getPointId())))
+				.properties(OProperties.string(Comments.Columns.TEXT, comment.getText()))
+				.execute();
+		// @formatter:on
+	}
+	
 	public OEntity insertDescription(final Description description) {
 
 		// @formatter:off

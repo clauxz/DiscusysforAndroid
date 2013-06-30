@@ -88,6 +88,12 @@ public abstract class BaseActivity extends SherlockFragmentActivity {
 		if (this instanceof PersonsActivity) {
 			return;
 		}
+		
+		if(this instanceof WebReportViewActivity){
+			onBackPressed();
+			return;
+		}
+			
 		Intent intent = new Intent(Intent.ACTION_VIEW, Persons.CONTENT_URI);
 		intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
 		startActivity(intent);

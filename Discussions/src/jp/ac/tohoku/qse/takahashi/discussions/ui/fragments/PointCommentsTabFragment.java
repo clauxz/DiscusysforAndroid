@@ -45,6 +45,7 @@ import com.actionbarsherlock.app.SherlockFragment;
 public class PointCommentsTabFragment extends SherlockFragment implements OnClickListener,
 		OnItemClickListener {
 
+	
 	private static final boolean DEBUG = true && ApplicationConstants.DEV_MODE;
 	private static final String TAG = PointCommentsTabFragment.class.getSimpleName();
 	private TextView mPointNameTextView;
@@ -137,6 +138,7 @@ public class PointCommentsTabFragment extends SherlockFragment implements OnClic
 			if (!TextUtils.isEmpty(comment)) {
 				mCommentEditText.setText("");
 				insertComment(comment);
+				WPFCork_insertCommentPlaceholder();
 			}
 		}
 	}
@@ -202,6 +204,23 @@ public class PointCommentsTabFragment extends SherlockFragment implements OnClic
 		commentValues.putInt(Comments.Columns.POINT_ID, mSelectedPoint.getPointId());
 		commentValues.putInt(Comments.Columns.PERSON_ID, mLoggedInPersonId);
 		((BaseActivity) getActivity()).getServiceHelper().insertComment(commentValues, mSelectedPoint);
+	}
+	
+	/**
+	 * Function used only for fixing WPF client bug. In future such function need to delete when 
+	 * WPF client will be fixed (wpf client will change algorithm for comment adding and placeholder functionality).
+	 * 
+	 */
+	private void WPFCork_insertCommentPlaceholder()
+	{
+		String comment=getActivity().getResources().getString(R.string.wpf_cork_comment_placeholder_text);
+		
+		Bundle commentValues = new Bundle();
+		commentValues.putString(Comments.Columns.TEXT, comment);
+		commentValues.putInt(Comments.Columns.POINT_ID, mSelectedPoint.getPointId());
+		//commentValues.putInt(Comments.Columns.PERSON_ID, Integer.valueOf(null));//mLoggedInPersonId);
+		
+		((BaseActivity) getActivity()).getServiceHelper().WPFCork_insertPlaceholder(commentValues, mSelectedPoint);
 	}
 
 	private void onActionDeleteComment(final MenuItem item) {

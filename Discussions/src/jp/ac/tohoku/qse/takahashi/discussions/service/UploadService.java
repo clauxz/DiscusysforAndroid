@@ -40,6 +40,11 @@ import jp.ac.tohoku.qse.takahashi.discussions.utils.YoutubeHelper;
 /** Background {@link Service} that synchronizes data living in {@link ScheduleProvider}. */
 public class UploadService extends IntentService {
 
+	/**
+	 * Such constant can be removed when WPF client comment placeholder will be fixed.
+	 * All logic which works with WPFCORK prefix also can be removed from code files.
+	 */
+	public static final int TYPE_INSERT_WPFCORK_COMMENTPLACEHOLDER=0x8;
 	public static final int TYPE_INSERT_ATTACHMENT = 0x6;
 	public static final int TYPE_INSERT_COMMENT = 0x5;
 	public static final int TYPE_INSERT_DESCRIPTION = 0x3;
@@ -153,6 +158,9 @@ public class UploadService extends IntentService {
 					break;
 				case TYPE_INSERT_COMMENT:
 					insertComment(intent);
+					break;
+				case TYPE_INSERT_WPFCORK_COMMENTPLACEHOLDER:
+					WPFCork_insertCommentPlaceholder(intent);
 					break;
 				case TYPE_INSERT_ATTACHMENT:
 					insertAttachment(intent);
@@ -308,6 +316,34 @@ public class UploadService extends IntentService {
 		PhotonHelper.sendStatsEvent(StatsEvent.COMMENT_ADDED, selectedPoint, photonReceiver);
 	}
 
+	/**
+	 * WPF client comment feedback bug fix code. Used only until WPF client will not be fixed.
+	 * Such function only insert new comment placeholder which WPF client require. 
+	 * <b>When WPF client will be fixed all code with WPFCork prefix can be removed from code files</b>.
+	 * 
+	 * @param intent
+	 */
+	private void WPFCork_insertCommentPlaceholder(Intent intent)
+	{
+		Bundle commentBundle = intent.getBundleExtra(ServiceExtraKeys.VALUE);
+		Comment comment = new Comment(commentBundle,false);
+		logd("[insertComment] " + comment.getText());
+		OdataWriteClient odataWrite = new OdataWriteClient(this);
+		
+		OEntity entity = odataWrite.WPFCork_insertComment(comment);
+		
+		int commentId = (Integer) entity.getProperty(Comments.Columns.ID).getValue();
+		logd("[insertComment] new comment id: " + commentId);
+		comment.setId(commentId);
+		getContentResolver().insert(Comments.CONTENT_URI, comment.WPFCork_toContentValues());
+		SelectedPoint selectedPoint = getSelectedPointFromExtra(intent);
+		ResultReceiver photonReceiver = getPhotonReceiverFromExtra(intent);
+		PhotonHelper.sendArgPointUpdated(selectedPoint, photonReceiver);
+		PhotonHelper.sendStatsEvent(StatsEvent.COMMENT_ADDED, selectedPoint, photonReceiver);
+	}
+	
+	
+	
 	private void insertDescription(final Intent intent) {
 
 		Bundle descriptionBundle = intent.getBundleExtra(ServiceExtraKeys.VALUE);

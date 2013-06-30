@@ -36,8 +36,6 @@ public class WebReportViewActivity extends BaseActivity {
 	private EditText mEditText;
 	private MenuItem mMenuItem;
 	
-	private Bundle savedState;
-	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -73,18 +71,12 @@ public class WebReportViewActivity extends BaseActivity {
 			mWebView.getSettings().setUserAgentString(
 					"Mozilla/5.0 AppleWebKit/533.1 (KHTML, like Gecko) Version/4.0 Mobile Safari/533.1");
 		}
-		
+		/*
 		if(savedInstanceState!=null)
 		{
-			Log.i("Disc restore",String.valueOf(savedInstanceState));
-			this.savedState=savedInstanceState;
 			mWebView.restoreState(savedInstanceState);
 		}
-		else
-		{
-			this.savedState=null;
-			
-		}
+		//*/
 		
 		mEditText = (EditText) findViewById(R.id.edittext_url);
 		mWebView.requestFocus();
@@ -109,8 +101,7 @@ public class WebReportViewActivity extends BaseActivity {
 	protected void onResume() {
 
 		super.onResume();
-		if(this.savedState==null)
-			buildUrl();
+		buildUrl();
 	}
 	/**
 	 * Detect Discussion and topic IDs.

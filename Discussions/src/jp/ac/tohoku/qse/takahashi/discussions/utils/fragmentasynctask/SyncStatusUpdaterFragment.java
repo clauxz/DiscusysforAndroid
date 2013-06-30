@@ -183,8 +183,12 @@ public class SyncStatusUpdaterFragment extends  Fragment implements DetachableRe
 				// Error happened down in SyncService, show as toast.
 				mSyncing = false;
 				if (getActivity() != null) {
+					
 					final String errorText = getString(R.string.toast_sync_error, resultData
 							.getString(Intent.EXTRA_TEXT));
+					
+					Log.i("Disc frg onReceiveResult ",errorText);
+					
 					showLongToast(errorText);
 				}
 				break;

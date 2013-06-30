@@ -158,6 +158,22 @@ public class ServiceHelper {
 		intent.putExtra(ServiceExtraKeys.PHOTON_RECEIVER, mPhotonController.getResultReceiver());
 		mContext.startService(intent);
 	}
+	
+	/**
+	 * Function used only for fixing WPF client bug. In future such function need to delete when 
+	 * WPF client will be fixed (wpf client will change algorithm for comment adding and placeholder functionality).
+	 * 
+	 */
+	public void WPFCork_insertPlaceholder(final Bundle commentValues, final SelectedPoint selectedPoint) {
+
+		Intent intent = new Intent(IntentAction.UPLOAD);
+		intent.putExtra(ServiceExtraKeys.TYPE_ID, UploadService.TYPE_INSERT_WPFCORK_COMMENTPLACEHOLDER);
+		intent.putExtra(ServiceExtraKeys.VALUE, commentValues);
+		intent.putExtra(ServiceExtraKeys.SELECTED_POINT, selectedPoint);
+		intent.putExtra(ServiceExtraKeys.ACTIVITY_RECEIVER, mActivityReceiver);
+		intent.putExtra(ServiceExtraKeys.PHOTON_RECEIVER, mPhotonController.getResultReceiver());
+		mContext.startService(intent);
+	}
 
 	public void insertPointAndDescription(final Bundle values, final SelectedPoint selectedPoint) {
 
