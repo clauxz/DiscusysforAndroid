@@ -1,5 +1,11 @@
 package jp.ac.tohoku.qse.takahashi.discussions.ui.activities;
 
+import java.io.BufferedReader;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+
 import com.actionbarsherlock.view.Menu;
 import com.actionbarsherlock.view.MenuInflater;
 import com.actionbarsherlock.view.MenuItem;
@@ -13,8 +19,11 @@ import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.text.method.HideReturnsTransformationMethod;
 import android.util.Log;
+import android.view.MotionEvent;
+import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 import android.webkit.WebView;
+import android.webkit.WebView.HitTestResult;
 import android.webkit.WebViewClient;
 import android.widget.EditText;
 
@@ -27,6 +36,8 @@ import android.widget.EditText;
  */
 public class WebReportViewActivity extends BaseActivity {
 
+	//private static final String SCRIPT_PATH="scripts/webreport.js";
+	
 	private static final String URL_REPORT="/discsvc/report?";
 	private static final String URL_PARAM_DISCUSSIONID="discussionId=";
 	private static final String URL_PARAM_TOPICID="topicId=";
@@ -36,19 +47,25 @@ public class WebReportViewActivity extends BaseActivity {
 	private EditText mEditText;
 	private MenuItem mMenuItem;
 	
+	//private boolean IsScreeptAdded=false;
+	private boolean IsShowBlock;
+	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		initFormExtra();
+		IsShowBlock=false;
 		setContentView(R.layout.activity_webview);
 		mWebView = (WebView) findViewById(R.id.webview);
+		//mWebView.addJavascriptInterface(new JavaScriptReportInterface(), "JSIR");
+		mWebView.getSettings().setJavaScriptEnabled(true);
 		
 		mWebView.setWebViewClient(new WebViewClient()
 		{
 			@Override
 			public void onPageStarted(WebView view, String url, Bitmap favicon) {
 				if(mMenuItem!=null){
-					Log.i("Disc","show progressbar URL:   "+String.valueOf(url));
+					//Log.i("Disc","show progressbar URL:   "+String.valueOf(url));
 					mMenuItem.setVisible(true);
 				}
 				super.onPageStarted(view, url, favicon);
@@ -56,27 +73,43 @@ public class WebReportViewActivity extends BaseActivity {
 			
 			@Override
 			public void onPageFinished(WebView view, String url) {
+				
+				
 				if(mMenuItem!=null){
-					Log.i("Disc","hide progressbar URL:   "+String.valueOf(url));
+					//Log.i("Disc","hide progressbar URL:   "+String.valueOf(url));
 					mMenuItem.setVisible(false);//hide progress bar 
+					
+					
 				}
+				
+				IsShowBlock=isWebViewShowLinkBlock(url);
+				
 				super.onPageFinished(view, url);
 			}
 		});
-		//mWebView.getSettings().setLoadWithOverviewMode(true);
-		//mWebView.getSettings().setUseWideViewPort(true);
+		/*
+		mWebView.setOnTouchListener(new View.OnTouchListener() {
+			
+			@Override
+			public boolean onTouch(View v, MotionEvent event) {
+			
+				WebView.HitTestResult hr=((WebView)v).getHitTestResult();
+				Log.i("Disc", "getExtra = "+ hr.getExtra() + "\t\t Type=" + hr.getType());
+				if(hr.getType()==WebView.HitTestResult.ANCHOR_TYPE){
+					Log.i("Disc WEB","EXTRA:"+String.valueOf(hr.getExtra()));
+				}
+					
+				return false;
+			}
+		});
+		//*/
 		mWebView.getSettings().setBuiltInZoomControls(true);
 		
 		if (isTablet(this)) {
 			mWebView.getSettings().setUserAgentString(
 					"Mozilla/5.0 AppleWebKit/533.1 (KHTML, like Gecko) Version/4.0 Mobile Safari/533.1");
 		}
-		/*
-		if(savedInstanceState!=null)
-		{
-			mWebView.restoreState(savedInstanceState);
-		}
-		//*/
+		
 		
 		mEditText = (EditText) findViewById(R.id.edittext_url);
 		mWebView.requestFocus();
@@ -85,6 +118,18 @@ public class WebReportViewActivity extends BaseActivity {
 			    INPUT_METHOD_SERVICE);
 		imm.hideSoftInputFromWindow(getCurrentFocus().getWindowToken(), 0);
 		
+	}
+	
+	@Override
+	public void onBackPressed() {
+		if(IsShowBlock==true){
+			IsShowBlock=false;
+			if(mWebView!=null){
+				mWebView.scrollTo(0, 0);
+			}
+			return;
+		}		
+		super.onBackPressed();
 	}
 
 	@Override
@@ -135,14 +180,38 @@ public class WebReportViewActivity extends BaseActivity {
 		//session ID
 		url+="&"+URL_PARAM_SESSIONID+String.valueOf(sessionId);
 		
-		Log.v("Discussion","Report URl:"+url);
+		Log.v("Disc report","Report URl:"+url);
 		mEditText.setText(url);
+		
+		/*
+		//Can be added if need to add button in to the <div class='toc'...
+		mWebView.setOnTouchListener(new View.OnTouchListener() {
+			
+			@Override
+			public boolean onTouch(View v, MotionEvent event) {
+				// TODO Auto-generated method stub
+				
+				WebView.HitTestResult hr=((WebView)v).getHitTestResult();
+				if(hr!=null)
+					Log.i("Disc WEB TOUCH","TYPE:"+String.valueOf(hr.getType())+" EXTRA:"+String.valueOf(hr.getExtra()));
+				
+				
+				if(event.getAction()==MotionEvent.ACTION_MOVE)
+				{
+					Log.i("Disc","ACTION MOVE");
+				}
+				return false;
+			}
+		});
+		//*/
+		
+		
 		mWebView.setFocusable(true);
 		mWebView.loadUrl(url);
 		
+		
 		if(mMenuItem!=null)
 		{
-			Log.i("Disc","mMenuItem visible=true; buildUrl");
 			mMenuItem.setVisible(true);
 		}
 	}
@@ -178,12 +247,35 @@ public class WebReportViewActivity extends BaseActivity {
 		case R.id.menu_refresh:
 			{
 				String url=mEditText.getText().toString();
-				mWebView.loadUrl(url);
-				Log.i("Dsc","URL: "+String.valueOf(url));				
+				mWebView.loadUrl(url);				
 			}
 			break;
 		}
 		
 		return super.onOptionsItemSelected(item);
 	}
+	
+	/**
+	 * Check url. If Anchor was pressed from the first DIV block with class='toc'. 
+	 * 
+	 * @param url
+	 * @return TRUE if anchor was pressed otherwice return FALSE
+	 */
+	private boolean isWebViewShowLinkBlock(String url){
+		
+		String[] blocks={"#basicInfo","#participants","#bg",
+				"#media","#sources","#finalBoard",
+				"#summary","#argPoints","#clustInfo",
+				"#linkInfo"};
+		
+	
+		for(int i=0;i<blocks.length;i++){
+			if(url.contains(blocks[i])){
+					return true;
+				}
+		}
+		return false;
+	}
+	
+	
 }
