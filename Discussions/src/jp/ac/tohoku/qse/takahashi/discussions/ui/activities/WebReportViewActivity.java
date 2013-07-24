@@ -105,6 +105,10 @@ public class WebReportViewActivity extends BaseActivity {
 		//*/
 		mWebView.getSettings().setBuiltInZoomControls(true);
 		
+		//mWebView.getSettings().setLoadWithOverviewMode(true);
+		mWebView.getSettings().setUseWideViewPort(true);
+
+		
 		if (isTablet(this)) {
 			mWebView.getSettings().setUserAgentString(
 					"Mozilla/5.0 AppleWebKit/533.1 (KHTML, like Gecko) Version/4.0 Mobile Safari/533.1");

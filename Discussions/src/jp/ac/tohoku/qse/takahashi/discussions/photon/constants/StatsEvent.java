@@ -14,6 +14,7 @@ public class StatsEvent {
 	public static final int CLUSTER_OUT = 9;
 	public static final int COMMENT_ADDED = 29;
 	public static final int COMMENT_REMOVED = 30;
+	public static final int COMMENTPERSONREADEDENTRY_ADDED=32;
 	public static final int FREE_DRAWING_CREATED = 13;
 	public static final int FREE_DRAWING_MOVED = 16;
 	public static final int FREE_DRAWING_REMOVED = 14;

@@ -1,6 +1,10 @@
 package jp.ac.tohoku.qse.takahashi.discussions.data.provider;
 
+import java.lang.ref.Reference;
+
+import jp.ac.tohoku.qse.takahashi.discussions.data.model.Attachment;
 import jp.ac.tohoku.qse.takahashi.discussions.data.provider.DiscussionsContract.Attachments;
+import jp.ac.tohoku.qse.takahashi.discussions.data.provider.DiscussionsContract.CommentsPersonReadEntry;
 import jp.ac.tohoku.qse.takahashi.discussions.data.provider.DiscussionsContract.Comments;
 import jp.ac.tohoku.qse.takahashi.discussions.data.provider.DiscussionsContract.Descriptions;
 import jp.ac.tohoku.qse.takahashi.discussions.data.provider.DiscussionsContract.Discussions;
@@ -73,6 +77,20 @@ public class DiscussionsDatabase extends SQLiteOpenHelper {
 				+ Persons.Columns.ONLINE_DEVICE_TYPE + " INTEGER,"
 				+ " UNIQUE (" + Persons.Columns.ID + ") ON CONFLICT REPLACE)");
 		
+		/*
+		String topicSQL="CREATE TABLE " + Topics.TABLE_NAME + " (" 
+				+ BaseColumns._ID + " INTEGER PRIMARY KEY AUTOINCREMENT,"
+				+ Topics.Columns.ID + " INTEGER NOT NULL,"
+				+ Topics.Columns.NAME + " TEXT NOT NULL,"
+				+ Topics.Columns.RUNNING + " INTEGER NOT NULL,"
+				+ Topics.Columns.CUMULATIVE_DURATION + " INTEGER NOT NULL,"
+				+ Topics.Columns.ANNOTATION + " BLOB,"
+				+ Topics.Columns.DISCUSSION_ID + " INTEGER NOT NULL " + References.DISCUSSION_ID + " ON UPDATE CASCADE ON DELETE CASCADE,"
+				+ " UNIQUE (" + Topics.Columns.ID + ") ON CONFLICT REPLACE)";
+		Log.i("Disc CREATE TOPIC",topicSQL);
+		db.execSQL(topicSQL);
+		//*/
+		//*
 		db.execSQL("CREATE TABLE " + Topics.TABLE_NAME + " (" 
 				+ BaseColumns._ID + " INTEGER PRIMARY KEY AUTOINCREMENT,"
 				+ Topics.Columns.ID + " INTEGER NOT NULL,"
@@ -82,7 +100,20 @@ public class DiscussionsDatabase extends SQLiteOpenHelper {
 				+ Topics.Columns.ANNOTATION + " BLOB,"
 				+ Topics.Columns.DISCUSSION_ID + " INTEGER NOT NULL " + References.DISCUSSION_ID + " ON UPDATE CASCADE ON DELETE CASCADE,"
 				+ " UNIQUE (" + Topics.Columns.ID + ") ON CONFLICT REPLACE)");
+		//*/
 		
+		String commentSQL="CREATE TABLE " + Comments.TABLE_NAME + " (" 
+				+ BaseColumns._ID + " INTEGER PRIMARY KEY AUTOINCREMENT,"
+				+ Comments.Columns.ID + " INTEGER NOT NULL,"
+				+ Comments.Columns.TEXT + " TEXT NOT NULL,"
+				+ Comments.Columns.PERSON_ID + " INTEGER, " 
+				+ Comments.Columns.POINT_ID + " INTEGER, " 
+				+ Comments.Columns.ISNEW + " INTEGER, "   //new column, new old comment
+				+ " UNIQUE (" + Comments.Columns.ID + ") ON CONFLICT REPLACE)";
+		
+		Log.i("Disc CREATE COMMENT",commentSQL);
+		db.execSQL(commentSQL);
+		/*
 		db.execSQL("CREATE TABLE " + Comments.TABLE_NAME + " (" 
 				+ BaseColumns._ID + " INTEGER PRIMARY KEY AUTOINCREMENT,"
 				+ Comments.Columns.ID + " INTEGER NOT NULL,"
@@ -90,7 +121,23 @@ public class DiscussionsDatabase extends SQLiteOpenHelper {
 				+ Comments.Columns.PERSON_ID + " INTEGER, " 
 				+ Comments.Columns.POINT_ID + " INTEGER, " 
 				+ " UNIQUE (" + Comments.Columns.ID + ") ON CONFLICT REPLACE)");
+		//*/
 		
+		// table contains information comments which was readed
+		String commentReadEntrySQL="CREATE TABLE "+CommentsPersonReadEntry.TABLE_NAME+" ("
+				+BaseColumns._ID+" INTEGER PRIMARY KEY AUTOINCREMENT,"
+				+CommentsPersonReadEntry.Columns.ID+" INTEGER NOT NULL,"
+				
+				+CommentsPersonReadEntry.Columns.COMMENT_ID+" INTEGER "+References.COMMENT_ID+" ON UPDATE CASCADE ON DELETE CASCADE,"
+				+CommentsPersonReadEntry.Columns.PERSON_ID+" INTEGER "+References.PERSON_ID+" ON UPDATE CASCADE ON DELETE CASCADE,"
+				//+" FOREIGN KEY ( "+CommentsPersonReadEntry.Columns.COMMENT_ID+" ) REFERENCES "+Comments.TABLE_NAME+" ( "+Comments.Columns.ID+" ) ,"
+				//+" FOREIGN KEY ( "+CommentsPersonReadEntry.Columns.PERSON_ID+") PREFRENCES "+Persons.TABLE_NAME+" ( "+Persons.Columns.ID+" ) ,"
+				+" UNIQUE ("+CommentsPersonReadEntry.Columns.ID+") ON CONFLICT REPLACE)";
+		Log.i("Disc CREATE CommentsPersonEntry",commentReadEntrySQL);
+		db.execSQL(commentReadEntrySQL);
+		
+		
+				
 		db.execSQL("CREATE TABLE " + Descriptions.TABLE_NAME + " (" 
 				+ BaseColumns._ID + " INTEGER PRIMARY KEY AUTOINCREMENT,"
 				+ Descriptions.Columns.ID + " INTEGER NOT NULL,"
@@ -99,6 +146,23 @@ public class DiscussionsDatabase extends SQLiteOpenHelper {
 				+ Descriptions.Columns.POINT_ID + " INTEGER, " 
 				+ " UNIQUE (" + Descriptions.Columns.ID + ") ON CONFLICT REPLACE)");
 		
+		String pointSQL="CREATE TABLE " + Points.TABLE_NAME + " (" 
+				+ BaseColumns._ID + " INTEGER PRIMARY KEY AUTOINCREMENT,"
+				+ Points.Columns.ID + " INTEGER NOT NULL,"
+				+ Points.Columns.PERSON_ID + " INTEGER NOT NULL " + References.PERSON_ID + " ON UPDATE CASCADE ON DELETE CASCADE,"
+				+ Points.Columns.TOPIC_ID + " INTEGER NOT NULL " + References.TOPIC_ID + " ON UPDATE CASCADE ON DELETE CASCADE,"
+			    + Points.Columns.NAME + " TEXT NOT NULL,"
+				+ Points.Columns.SHARED_TO_PUBLIC + " INTEGER NOT NULL,"
+				+ Points.Columns.CHANGES_PENDING + " INTEGER NOT NULL,"
+				+ Points.Columns.ORDER_NUMBER + " INTEGER NOT NULL,"
+				+ Points.Columns.SIDE_CODE + " INTEGER NOT NULL,"
+				+ Points.Columns.RECENTLY_ENTERED_MEDIA_URL + " TEXT NOT NULL,"
+				+ Points.Columns.RECENTLY_ENTERED_SOURCE + " TEXT NOT NULL,"
+				+ Points.Columns.ISNEW + " INTEGER, "
+				+ " UNIQUE (" + Points.Columns.ID + ") ON CONFLICT REPLACE)";
+		Log.i("Disc CREATE POINT",pointSQL);
+		db.execSQL(pointSQL);
+		/*
 		db.execSQL("CREATE TABLE " + Points.TABLE_NAME + " (" 
 				+ BaseColumns._ID + " INTEGER PRIMARY KEY AUTOINCREMENT,"
 				+ Points.Columns.ID + " INTEGER NOT NULL,"
@@ -112,7 +176,28 @@ public class DiscussionsDatabase extends SQLiteOpenHelper {
 				+ Points.Columns.RECENTLY_ENTERED_MEDIA_URL + " TEXT NOT NULL,"
 				+ Points.Columns.RECENTLY_ENTERED_SOURCE + " TEXT NOT NULL,"
 				+ " UNIQUE (" + Points.Columns.ID + ") ON CONFLICT REPLACE)");
+		//*/
+		String attachemntSQL="CREATE TABLE " + Attachments.TABLE_NAME + " (" 
+				+ BaseColumns._ID + " INTEGER PRIMARY KEY AUTOINCREMENT,"
+				+ Attachments.Columns.ID + " INTEGER NOT NULL,"
+				+ Attachments.Columns.NAME + " TEXT NOT NULL,"
+				+ Attachments.Columns.FORMAT + " INTEGER NOT NULL,"
+				+ Attachments.Columns.PERSON_ID + " INTEGER, "
+				+ Attachments.Columns.POINT_ID + " INTEGER,"
+				+ Attachments.Columns.DISCUSSION_ID + " INTEGER,"
+				+ Attachments.Columns.THUMB + " BLOB,"
+				+ Attachments.Columns.VIDEO_EMBED_URL + " TEXT,"
+				+ Attachments.Columns.VIDEO_LINK_URL + " TEXT,"
+				+ Attachments.Columns.VIDEO_THUMB_URL + " TEXT,"
+				+ Attachments.Columns.LINK + " TEXT,"
+				+ Attachments.Columns.TITLE + " TEXT,"
+				+ Attachments.Columns.ORDER_NUMBER + " NOT NULL,"
+				+ Attachments.Columns.ISNEW + " INTEGER, "
+				+ " UNIQUE (" + Attachments.Columns.ID + ") ON CONFLICT REPLACE)";
 		
+		Log.i("Disc CREATE ATTACHEMNT", attachemntSQL);
+		db.execSQL(attachemntSQL);
+		/*
 		db.execSQL("CREATE TABLE " + Attachments.TABLE_NAME + " (" 
 				+ BaseColumns._ID + " INTEGER PRIMARY KEY AUTOINCREMENT,"
 				+ Attachments.Columns.ID + " INTEGER NOT NULL,"
@@ -129,7 +214,7 @@ public class DiscussionsDatabase extends SQLiteOpenHelper {
 				+ Attachments.Columns.TITLE + " TEXT,"
 				+ Attachments.Columns.ORDER_NUMBER + " NOT NULL,"
 				+ " UNIQUE (" + Attachments.Columns.ID + ") ON CONFLICT REPLACE)");
-		
+		//*/		
 		db.execSQL("CREATE TABLE " + Sources.TABLE_NAME + " (" 
 				+ BaseColumns._ID + " INTEGER PRIMARY KEY AUTOINCREMENT,"
 				+ Sources.Columns.ID + " INTEGER NOT NULL,"
@@ -176,6 +261,7 @@ public class DiscussionsDatabase extends SQLiteOpenHelper {
 			db.execSQL("DROP TABLE IF EXISTS " + Topics.TABLE_NAME);
 			db.execSQL("DROP TABLE IF EXISTS " + PersonsTopics.TABLE_NAME);
 			db.execSQL("DROP TABLE IF EXISTS " + Comments.TABLE_NAME);
+			db.execSQL("DROP TABLE IF EXISTS " + CommentsPersonReadEntry.TABLE_NAME);
 			db.execSQL("DROP TABLE IF EXISTS " + Descriptions.TABLE_NAME);
 			db.execSQL("DROP TABLE IF EXISTS " + Seats.TABLE_NAME);
 			db.execSQL("DROP TABLE IF EXISTS " + Sessions.TABLE_NAME);
@@ -202,5 +288,8 @@ public class DiscussionsDatabase extends SQLiteOpenHelper {
 		static final String SESSION_ID = "REFERENCES " + Sessions.TABLE_NAME + "(" + Sessions.Columns.ID
 				+ ")";
 		static final String TOPIC_ID = "REFERENCES " + Topics.TABLE_NAME + "(" + Topics.Columns.ID + ")";
+		
+		static final String COMMENT_ID="REFERENCES "+ Comments.TABLE_NAME+"("+Comments.Columns.ID+")";
+		
 	}
 }

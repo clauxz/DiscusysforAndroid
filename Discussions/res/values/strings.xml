@@ -110,8 +110,10 @@
     <string name="progress_downloading_attachments">Attachments ...</string>
     <string name="progress_downloading_sessions">Sessions ...</string>
     <string name="progress_downloading_seats">Seats ...</string>
-    <string name="progress_calculate_count">Calculate total count ...</string>
+    <string name="progress_downloading_sources">Sources...</string>
+    <string name="progress_downloading_commentpersonentity">Readed comments entities...</string>
     <string name="progress_downloading_finished">Finished</string>
+    <string name="progress_calculate_count">Calculate total count ...</string>
     <string name="progress_title_download_database">Loading</string>
 
     <string name="server_name_local">Local</string>

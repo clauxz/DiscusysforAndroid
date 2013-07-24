@@ -28,6 +28,7 @@ import jp.ac.tohoku.qse.takahashi.discussions.data.odata.HttpUtil;
 import jp.ac.tohoku.qse.takahashi.discussions.data.odata.OdataReadClientWithBatchTransactions;
 import jp.ac.tohoku.qse.takahashi.discussions.data.provider.DiscussionsContract.Attachments;
 import jp.ac.tohoku.qse.takahashi.discussions.data.provider.DiscussionsContract.Comments;
+import jp.ac.tohoku.qse.takahashi.discussions.data.provider.DiscussionsContract.CommentsPersonReadEntry;
 import jp.ac.tohoku.qse.takahashi.discussions.data.provider.DiscussionsContract.Descriptions;
 import jp.ac.tohoku.qse.takahashi.discussions.data.provider.DiscussionsContract.Discussions;
 import jp.ac.tohoku.qse.takahashi.discussions.data.provider.DiscussionsContract.Persons;
@@ -127,7 +128,8 @@ public class DownloadService extends IntentService {
 		validateIntent(intent);
 		activityReceiver = getActivityReceiverFromExtra(intent);
 		if (isConnected()) {
-			ActivityResultHelper.sendProgress(activityReceiver, getString(R.string.progress_connecting), 0);
+			ActivityResultHelper.sendProgress(activityReceiver, 
+					getString(R.string.progress_connecting), 0);
 		} else {
 			String errorString = getString(R.string.text_error_network_off);
 			ActivityResultHelper.sendStatusError(activityReceiver, errorString);
@@ -199,9 +201,13 @@ public class DownloadService extends IntentService {
 		int attachmentsCount = getTableCount(Attachments.TABLE_NAME);
 		int sourcesCount = getTableCount(Sources.TABLE_NAME);
 		int descriptionCount = getTableCount(Descriptions.TABLE_NAME);
-		int commentsCount = getTableCount(Comments.TABLE_NAME);
+		int commentsCount = getTableCount(Comments.TABLE_NAME);		
+		int commentsPersonEntity=getTableCount(CommentsPersonReadEntry.TABLE_NAME);
+		
 		int totalCount = sessionCount + seatsCount + personsCount + discussionsCount + pointsCount
-				+ topicsCount + attachmentsCount + sourcesCount + descriptionCount + commentsCount;
+				+ topicsCount + attachmentsCount + sourcesCount + descriptionCount + commentsCount
+				+commentsPersonEntity;
+		
 		ActivityResultHelper.sendStatusStartWithCount(activityReceiver, totalCount);
 		ActivityResultHelper.sendProgress(activityReceiver,
 				getString(R.string.progress_downloading_sessions), downloadedCount);
@@ -257,8 +263,19 @@ public class DownloadService extends IntentService {
 				downloadedCount);
 		odataClient.refreshSources();
 		logd("[downloadAll] sources completed");
-		odataClient.applyBatchOperations();
 		downloadedCount += sourcesCount;
+		
+		
+		//comments person readed  entities
+		ActivityResultHelper.sendProgress(activityReceiver, getString(R.string.progress_downloading_commentpersonentity),
+				downloadedCount);
+		odataClient.refreshCommentsPersonEntry();
+		logd("[downloadAll] comments person read entities compleated");
+		downloadedCount+=commentsPersonEntity;
+		
+		
+				
+		odataClient.applyBatchOperations();
 		ActivityResultHelper.sendProgress(activityReceiver,
 				getString(R.string.progress_downloading_finished), downloadedCount);
 		logd("[downloadAll] load time: " + (System.currentTimeMillis() - startTime));

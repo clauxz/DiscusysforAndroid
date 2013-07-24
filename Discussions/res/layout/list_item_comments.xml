@@ -28,6 +28,20 @@
         android:layout_gravity="center_vertical"
         android:layout_marginBottom="4dp"
         android:layout_marginRight="4dp"
-        android:layout_marginTop="4dp" />
+        android:layout_marginTop="4dp"
+        android:layout_weight="1"/>
+    
+    <RelativeLayout 
+        android:layout_width="17dp"
+        android:layout_height="match_parent">
+        <ImageView 
+            android:id="@+id/image_comment_item_new"
+            android:layout_width="10dp"
+            android:layout_height="10dp"
+            android:layout_centerVertical="true"
+            android:layout_alignParentRight="true"
+            android:layout_marginTop="7dp"
+            android:layout_marginRight="7dp"/>
+    </RelativeLayout>
 
 </LinearLayout>

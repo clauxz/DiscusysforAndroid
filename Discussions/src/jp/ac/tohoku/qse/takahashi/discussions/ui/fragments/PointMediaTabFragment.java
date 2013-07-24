@@ -194,7 +194,6 @@ public class PointMediaTabFragment extends SherlockFragment implements OnClickLi
 		if (Activity.RESULT_OK == resultCode) {
 			switch (requestCode) {
 				case PICK_CAMERA_PHOTO:
-					Log.i("Disc","onResult camera");
 					handleCameraResult(data);
 					break;
 				case PICK_IMAGE_REQUEST:

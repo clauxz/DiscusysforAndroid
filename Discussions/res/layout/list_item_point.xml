@@ -16,9 +16,19 @@
         style="@style/ListItemTextSingleLine"
         android:layout_gravity="center_vertical" />
 
+    <ImageView 
+        android:id="@+id/image_item_new"
+        android:layout_width="10dp"
+        android:layout_height="10dp"
+        android:layout_gravity="center"
+        android:layout_marginRight="5dp"/>
+
     <TextView
         android:id="@+id/list_item_text"
         style="@style/ListItemTextSingleLine"
-        android:layout_gravity="center_vertical" />
+        android:layout_gravity="center_vertical"
+        android:layout_weight="1" />
+  
+    
 
 </LinearLayout>

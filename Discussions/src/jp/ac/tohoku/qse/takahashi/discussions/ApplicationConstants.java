@@ -11,6 +11,11 @@ public class ApplicationConstants {
 	/** Clean up servers database if row with null foreign key found. */
 	public static final boolean ODATA_SANITIZE = false && DEV_MODE;
 
+	/** New point, comment attachement */
+	public static final int OBJECT_NEW=1;
+	/** Old point, comment, attachement */
+	public static final int OBJECT_OLD=0;
+	
 	/** A private Constructor prevents class from instantiating. */
 	private ApplicationConstants() {
 

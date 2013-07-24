@@ -207,6 +207,7 @@
                 <category android:name="android.intent.category.DEFAULT" />
 
                 <data android:mimeType="vnd.android.cursor.item/vnd.discussions.comment" />
+                <data android:mimeType="vnd.android.cursor.dir/vnd.discussions.commentpersonreadentry" />
             </intent-filter>
         </activity>
 

@@ -18,6 +18,7 @@ import java.io.File;
 import jp.ac.tohoku.qse.takahashi.discussions.ApplicationConstants;
 import jp.ac.tohoku.qse.takahashi.discussions.data.model.Attachment;
 import jp.ac.tohoku.qse.takahashi.discussions.data.model.Comment;
+import jp.ac.tohoku.qse.takahashi.discussions.data.model.CommentPersonReadEntry;
 import jp.ac.tohoku.qse.takahashi.discussions.data.model.Description;
 import jp.ac.tohoku.qse.takahashi.discussions.data.model.Point;
 import jp.ac.tohoku.qse.takahashi.discussions.data.model.SelectedPoint;
@@ -26,6 +27,7 @@ import jp.ac.tohoku.qse.takahashi.discussions.data.odata.HttpUtil;
 import jp.ac.tohoku.qse.takahashi.discussions.data.odata.OdataWriteClient;
 import jp.ac.tohoku.qse.takahashi.discussions.data.provider.DiscussionsContract.Attachments;
 import jp.ac.tohoku.qse.takahashi.discussions.data.provider.DiscussionsContract.Comments;
+import jp.ac.tohoku.qse.takahashi.discussions.data.provider.DiscussionsContract.CommentsPersonReadEntry;
 import jp.ac.tohoku.qse.takahashi.discussions.data.provider.DiscussionsContract.Descriptions;
 import jp.ac.tohoku.qse.takahashi.discussions.data.provider.DiscussionsContract.Points;
 import jp.ac.tohoku.qse.takahashi.discussions.data.provider.DiscussionsContract.Sources;
@@ -47,6 +49,7 @@ public class UploadService extends IntentService {
 	public static final int TYPE_INSERT_WPFCORK_COMMENTPLACEHOLDER=0x8;
 	public static final int TYPE_INSERT_ATTACHMENT = 0x6;
 	public static final int TYPE_INSERT_COMMENT = 0x5;
+	public static final int TYPE_INSERT_COMMENTPERSONREADEDENTRY=0x9;
 	public static final int TYPE_INSERT_DESCRIPTION = 0x3;
 	public static final int TYPE_INSERT_POINT_AND_DESCRIPTION = 0x4;
 	public static final int TYPE_INSERT_SOURCE = 0x7;
@@ -158,6 +161,9 @@ public class UploadService extends IntentService {
 					break;
 				case TYPE_INSERT_COMMENT:
 					insertComment(intent);
+					break;
+				case TYPE_INSERT_COMMENTPERSONREADEDENTRY:
+					insertCommentPersonReadedEntry(intent);
 					break;
 				case TYPE_INSERT_WPFCORK_COMMENTPLACEHOLDER:
 					WPFCork_insertCommentPlaceholder(intent);
@@ -316,6 +322,27 @@ public class UploadService extends IntentService {
 		PhotonHelper.sendStatsEvent(StatsEvent.COMMENT_ADDED, selectedPoint, photonReceiver);
 	}
 
+	/**
+	 * Comment is marked that it was readed by person.
+	 * @param intent
+	 */
+	private void insertCommentPersonReadedEntry(Intent intent){
+		Bundle markBundles=intent.getBundleExtra(ServiceExtraKeys.VALUE);
+		CommentPersonReadEntry commentEntry=new CommentPersonReadEntry(markBundles);
+		logd("[insertCommentPersonReadedEntry]  COMMENT ID:" + String.valueOf(commentEntry.getCommentId())
+				+" PERSON ID:"+String.valueOf(commentEntry.getPersonId()));
+		
+		OdataWriteClient odataWrite=new OdataWriteClient(this);
+		OEntity entity=odataWrite.insertCommentPersonReadedEntry(commentEntry);
+		int commentEntryId=(Integer)entity.getProperty(CommentsPersonReadEntry.Columns.ID).getValue();
+		logd("[insertCommentEntry] new commentPersonReadedEntry id: " + commentEntryId);
+		commentEntry.setId(commentEntryId);
+		getContentResolver().insert(CommentsPersonReadEntry.CONTENT_URI, commentEntry.toContentValues());
+		SelectedPoint selectedPoint=getSelectedPointFromExtra(intent);
+		ResultReceiver photonReceiver = getPhotonReceiverFromExtra(intent);
+		PhotonHelper.sendArgPointUpdated(selectedPoint, photonReceiver);
+		PhotonHelper.sendStatsEvent(StatsEvent.COMMENTPERSONREADEDENTRY_ADDED, selectedPoint, photonReceiver);
+	}
 	/**
 	 * WPF client comment feedback bug fix code. Used only until WPF client will not be fixed.
 	 * Such function only insert new comment placeholder which WPF client require. 

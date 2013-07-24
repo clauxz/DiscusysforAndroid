@@ -172,6 +172,14 @@ public abstract class BaseActivity extends SherlockFragmentActivity {
 	@Override
 	protected void onStart() {
 
+		if(this instanceof CommentDetailsActivity){
+			Log.i("Disc START","onStart "+CommentDetailsActivity.class.getSimpleName());
+		}
+		else
+		{
+			Log.i("Disc START",this.getClass().getSimpleName());
+		}
+		
 		super.onStart();
 		if (DEBUG) {
 			Log.d(TAG, "[onStart]");

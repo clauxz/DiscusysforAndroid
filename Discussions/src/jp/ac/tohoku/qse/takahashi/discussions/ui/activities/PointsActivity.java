@@ -22,6 +22,7 @@ import com.actionbarsherlock.view.MenuInflater;
 import com.actionbarsherlock.view.MenuItem;
 
 import java.util.List;
+import java.util.Set;
 import java.util.Vector;
 
 import jp.ac.tohoku.qse.takahashi.discussions.data.PreferenceHelper;
@@ -91,7 +92,7 @@ public class PointsActivity extends BaseActivity implements PhotonServiceCallbac
 		{
 			menuInflater.inflate(R.menu.actionbar_points, menu);
 		}
-		
+				
 		//Log.i("Disc","onCreate option menu");
 		
 		// Calling super after populating the menu is necessary here to ensure that the
@@ -188,8 +189,12 @@ public class PointsActivity extends BaseActivity implements PhotonServiceCallbac
 		pagerTitleStrip = (PagerTitleStrip) findViewById(R.id.pagerTitleStrip);
 		pagerTitleStrip.setTextSize(TypedValue.COMPLEX_UNIT_SP, 24);
 		pagerTitleStrip.setPadding(5, 10, 10, 5);
+		
+		
 		getSupportLoaderManager().initLoader(PersonsCursorLoader.LOADER_TOPIC_PERSONS, null,
 				new PersonsCursorLoader());
+		
+		
 		FragmentManager fm = getSupportFragmentManager();
 		mSyncStatusUpdaterFragment = (SyncStatusUpdaterFragment) fm
 				.findFragmentByTag(SyncStatusUpdaterFragment.TAG);
@@ -197,6 +202,7 @@ public class PointsActivity extends BaseActivity implements PhotonServiceCallbac
 			mSyncStatusUpdaterFragment = new SyncStatusUpdaterFragment();
 			fm.beginTransaction().add(mSyncStatusUpdaterFragment, SyncStatusUpdaterFragment.TAG).commit();
 		}
+		
 	}
 
 	private void connectPhoton() {
@@ -297,7 +303,8 @@ public class PointsActivity extends BaseActivity implements PhotonServiceCallbac
 	}
 	
 	
-	private class PersonsCursorLoader implements LoaderManager.LoaderCallbacks<Cursor> {
+	private class PersonsCursorLoader implements LoaderManager.LoaderCallbacks<Cursor> 
+	{
 
 		private static final int LOADER_TOPIC_PERSONS = 1;
 
@@ -327,7 +334,6 @@ public class PointsActivity extends BaseActivity implements PhotonServiceCallbac
 
 		@Override
 		public void onLoadFinished(final Loader<Cursor> loader, final Cursor data) {
-
 			switch (loader.getId()) {
 				case LOADER_TOPIC_PERSONS:
 					initializePaging(data);
@@ -340,16 +346,28 @@ public class PointsActivity extends BaseActivity implements PhotonServiceCallbac
 
 		private void initializePaging(final Cursor cursor) {
 
+			for(String name:cursor.getColumnNames()){
+				Log.i("Disc cursor name",String.valueOf(name));
+			}
+			
 			List<Fragment> fragments = new Vector<Fragment>();
 			Bundle otherUsersArguments = new Bundle(3);
 			otherUsersArguments.putInt(ExtraKey.PERSON_ID, mPersonId);
 			otherUsersArguments.putInt(ExtraKey.ORIGIN_PERSON_ID, mPersonId);
 			otherUsersArguments.putString(ExtraKey.LIST_HEADER, getString(R.string.text_other_users_points));
+			/*
+			otherUsersArguments.putInt(ExtraKey.SESSION_ID, mSessionId);
+			otherUsersArguments.putInt(ExtraKey.TOPIC_ID, mTopicId);
+			//*/
 			fragments.add(Fragment.instantiate(PointsActivity.this, AllOtherUserPointListFragment.class
 					.getName(), otherUsersArguments));
 			Bundle currentUserPointsArguments = new Bundle(1);
 			currentUserPointsArguments.putString(ExtraKey.LIST_HEADER,
 					getString(R.string.text_current_user_points));
+			/*
+			currentUserPointsArguments.putInt(ExtraKey.SESSION_ID, mSessionId);
+			currentUserPointsArguments.putInt(ExtraKey.TOPIC_ID, mTopicId);
+			//*/
 			fragments.add(Fragment.instantiate(PointsActivity.this, UserPointListFragment.class.getName(),
 					currentUserPointsArguments));
 			int personIdIndex = cursor.getColumnIndexOrThrow(Persons.Columns.ID);
@@ -360,6 +378,10 @@ public class PointsActivity extends BaseActivity implements PhotonServiceCallbac
 					Bundle arguments = new Bundle(1);
 					arguments.putInt(ExtraKey.PERSON_ID, personId);
 					arguments.putInt(ExtraKey.ORIGIN_PERSON_ID, mPersonId);
+					/*
+					arguments.putInt(ExtraKey.SESSION_ID, mSessionId);
+					arguments.putInt(ExtraKey.TOPIC_ID, mTopicId);
+					//*/
 					String personName = cursor.getString(personNameIndex);
 					String listHeader = getString(R.string.text_other_users_points_format, personName);
 					arguments.putString(ExtraKey.LIST_HEADER, listHeader);

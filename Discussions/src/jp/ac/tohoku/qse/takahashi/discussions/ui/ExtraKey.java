@@ -7,6 +7,7 @@ public class ExtraKey {
 	public static final String BINARY_DATA = "extra_binary_data";
 	public static final String BINARY_DATA_DESCRIPTION = "extra_binary_data_description";
 	public static final String COMMENT_TEXT = "extra_comment_text";
+	public static final String COMMENT_NEW_FLAG="extracomment_new_flag";
 	public static final String DESCRIPTION_ID = "extra_description_id";
 	public static final String DESCRIPTION_TEXT = "extra_description_text";
 	public static final String DISCUSSION_ID = "extra_discussion_id";
@@ -19,6 +20,7 @@ public class ExtraKey {
 	public static final String POINT_ID = "extra_point_id";
 	public static final String POINT_NAME = "extra_point_name";
 	public static final String SELECTED_POINT = "extra_selected_point";
+	public static final String SELECTED_COMMENT="extra_selected_comment";
 	public static final String SESSION_ID = "extra_session_id";
 	public static final String SHARED_TO_PUBLIC = "extra_shared_to_public";
 	public static final String TOPIC_ID = "extra_topic_id";

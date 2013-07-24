@@ -1,12 +1,18 @@
 package jp.ac.tohoku.qse.takahashi.discussions.ui.fragments;
 
+import javax.ws.rs.core.UriBuilder;
+
 import jp.ac.tohoku.qse.takahashi.discussions.ApplicationConstants;
 import jp.ac.tohoku.qse.takahashi.discussions.data.model.Comment;
 import jp.ac.tohoku.qse.takahashi.discussions.data.model.SelectedPoint;
+import jp.ac.tohoku.qse.takahashi.discussions.data.provider.DiscussionsContract;
 import jp.ac.tohoku.qse.takahashi.discussions.data.provider.DiscussionsContract.Attachments;
 import jp.ac.tohoku.qse.takahashi.discussions.data.provider.DiscussionsContract.Comments;
+import jp.ac.tohoku.qse.takahashi.discussions.data.provider.DiscussionsContract.CommentsPersonReadEntry;
 import jp.ac.tohoku.qse.takahashi.discussions.data.provider.DiscussionsContract.Persons;
 import jp.ac.tohoku.qse.takahashi.discussions.data.provider.DiscussionsContract.Points;
+import jp.ac.tohoku.qse.takahashi.discussions.data.provider.DiscussionsProvider;
+import jp.ac.tohoku.qse.takahashi.discussions.data.provider.SelectionBuilder;
 import jp.ac.tohoku.qse.takahashi.discussions.ui.ExtraKey;
 import jp.ac.tohoku.qse.takahashi.discussions.ui.activities.BaseActivity;
 import jp.ac.tohoku.qse.takahashi.discussions.utils.TextViewUtils;
@@ -15,6 +21,7 @@ import jp.ac.tohoku.qse.takahashi.discussions.R;
 
 import android.content.Intent;
 import android.database.Cursor;
+import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.BaseColumns;
@@ -56,6 +63,10 @@ public class PointCommentsTabFragment extends SherlockFragment implements OnClic
 	private final PointCursorLoader mPointCursorLoader;
 	private int mLoggedInPersonId;
 	private SelectedPoint mSelectedPoint;
+	private int mSessionId;
+	//private int mTopicID;
+	//map of readed comments
+	
 
 	public PointCommentsTabFragment() {
 
@@ -76,6 +87,8 @@ public class PointCommentsTabFragment extends SherlockFragment implements OnClic
 		return mCommentsList;
 	}
 
+	
+	
 	@Override
 	public void onActivityCreated(final Bundle savedInstanceState) {
 
@@ -83,7 +96,55 @@ public class PointCommentsTabFragment extends SherlockFragment implements OnClic
 		populateSavedInstanceState(savedInstanceState);
 		setUpCommentsAdapter();
 		initCommentsLoader();
+		
+		//initReadedComments();
 	}
+	
+	private void initReadedComments(){
+		
+		Log.i("Disc","initReadedComments");
+		
+		Uri uri=Uri.parse(CommentsPersonReadEntry.A_TABLE_PREFIX);
+		
+		SelectionBuilder builder = new SelectionBuilder();
+		
+		DiscussionsProvider provider=(DiscussionsProvider)getActivity().getContentResolver()
+				.acquireContentProviderClient(
+						DiscussionsContract.CONTENT_AUTHORITY)
+						.getLocalContentProvider();
+		
+		
+		if(provider!=null)
+		{
+			Log.i("Disc","Provider:"+provider.toString());
+			
+			Cursor cursor=provider.query(uri, 
+							new String[]{
+								BaseColumns._ID,
+								CommentsPersonReadEntry.Columns.ID,
+								CommentsPersonReadEntry.Columns.COMMENT_ID,
+								CommentsPersonReadEntry.Columns.PERSON_ID}, 
+							CommentsPersonReadEntry.Columns.PERSON_ID+"=" + String.valueOf(mLoggedInPersonId),
+							new String[] {String.valueOf(mLoggedInPersonId)},
+							CommentsPersonReadEntry.Columns.ID+" ASC");
+			
+			if(cursor!=null){
+				Log.i("Disc","Cursor size:"+String.valueOf(cursor.getCount()));
+				
+				cursor.moveToFirst();
+			}
+			else
+			{
+				Log.i("Disc","Cursor = null");
+			}
+		}
+		else{
+			Log.i("Disc","Provider null");
+		}
+		
+			
+	}
+
 
 	@Override
 	public void onCreateContextMenu(final ContextMenu menu, final View v, final ContextMenuInfo menuInfo) {
@@ -124,9 +185,27 @@ public class PointCommentsTabFragment extends SherlockFragment implements OnClic
 
 		Cursor cursor = (Cursor) mCommentsAdapter.getItem(position - 1);
 		int commentIdIndex = cursor.getColumnIndexOrThrow(Comments.Columns.ID);
+		int commentIsNewIndex=cursor.getColumnIndex(Comments.Columns.ISNEW);
 		int commentId = cursor.getInt(commentIdIndex);
+		int commentIsNew=cursor.getInt(commentIsNewIndex);
 		Uri commentUri = Comments.buildTableUri(commentId);
+		
+		Log.i("Disc URI COM",String.valueOf(commentUri.toString()));
+		
 		Intent commentIntent = new Intent(Intent.ACTION_VIEW, commentUri);
+		
+		Bundle b=new Bundle();
+		b.putInt(ExtraKey.ORIGIN_PERSON_ID, mLoggedInPersonId);
+		//b.putInt(ExtraKey.TOPIC_ID,mTopicID );
+		b.putInt(ExtraKey.SELECTED_COMMENT, commentId);
+		if(commentIsNew==1)
+			b.putBoolean(ExtraKey.COMMENT_NEW_FLAG, true);
+		else
+			b.putBoolean(ExtraKey.COMMENT_NEW_FLAG, false);
+		b.putParcelable(ExtraKey.SELECTED_POINT, mSelectedPoint);
+		b.putInt(ExtraKey.SESSION_ID,mSessionId);
+		commentIntent.putExtras(b);
+		
 		startActivity(commentIntent);
 	}
 
@@ -185,8 +264,29 @@ public class PointCommentsTabFragment extends SherlockFragment implements OnClic
 		if (!arguments.containsKey(ExtraKey.ORIGIN_PERSON_ID)) {
 			throw new IllegalStateException("fragment was called without logged in person id extra");
 		}
+		
+		/*
+		if (!arguments.containsKey(ExtraKey.TOPIC_ID)) {
+			throw new IllegalStateException("fragment was called without logged in topic id extra");
+		}
+		if(arguments.containsKey(ExtraKey.SESSION_ID)
+				&& arguments.getInt(ExtraKey.SESSION_ID)!=0) // zore session is not exist ( not experiment mode)
+		{
+			//this.showExtMenu=true;
+			mSessionId=arguments.getInt(ExtraKey.SESSION_ID);
+			Log.v("Discussions","[Session ID] exists");
+		}
+		else
+		{
+			//this.showExtMenu=false;
+			mSessionId=Integer.MIN_VALUE;
+			Log.v("Discussions","[Session ID] not exists");
+		}
+		//*/
+		
 		mSelectedPoint = arguments.getParcelable(ExtraKey.SELECTED_POINT);
 		mLoggedInPersonId = arguments.getInt(ExtraKey.ORIGIN_PERSON_ID, Integer.MIN_VALUE);
+		//mTopicID=arguments.getInt(ExtraKey.TOPIC_ID);
 	}
 
 	private void populateSavedInstanceState(final Bundle savedInstanceState) {
@@ -242,8 +342,9 @@ public class PointCommentsTabFragment extends SherlockFragment implements OnClic
 	private void setUpCommentsAdapter() {
 
 		mCommentsAdapter = new SimpleCursorAdapter(getActivity(), R.layout.list_item_comments, null,
-				new String[] { Persons.Columns.NAME, Comments.Columns.TEXT, Persons.Columns.COLOR },
-				new int[] { R.id.text_comment_person_name, R.id.text_comment, R.id.image_person_color }, 0);
+				new String[] { Persons.Columns.NAME, Comments.Columns.TEXT, Persons.Columns.COLOR,Comments.Columns.ISNEW },
+				new int[] { R.id.text_comment_person_name, R.id.text_comment, R.id.image_person_color,
+			R.id.image_comment_item_new }, 0);
 		mCommentsAdapter.setViewBinder(new ViewBinder() {
 
 			@Override
@@ -262,6 +363,23 @@ public class PointCommentsTabFragment extends SherlockFragment implements OnClic
 						TextView itemName = (TextView) view;
 						itemName.setText(cursor.getString(columnIndex));
 						return true;
+					case R.id.image_comment_item_new:
+					{
+						int index=cursor.getColumnIndex(Points.Columns.ISNEW);
+						int isNew=cursor.getInt(index);
+						
+						Log.i("Disc setViewValue","COMMENT ISNEW:"+String.valueOf(isNew));
+						
+						if(ApplicationConstants.OBJECT_NEW==isNew){
+							((ImageView)view).setImageBitmap(
+									BitmapFactory.decodeResource(getResources(), R.drawable.ic_data_changed));
+						}
+						else
+						{
+							((ImageView)view).setImageBitmap(null);
+						}
+					}
+					return true;
 					default:
 						return false;
 				}
@@ -373,6 +491,11 @@ public class PointCommentsTabFragment extends SherlockFragment implements OnClic
 			if (DEBUG) {
 				Log.d(TAG, "[onLoadFinished] cursor count: " + data.getCount() + ", id: " + loader.getId());
 			}
+			
+			for(String name:data.getColumnNames()){
+				Log.i("Disc * column Name",String.valueOf(name));
+			}
+			
 			switch (loader.getId()) {
 				case COMMENTS_ID:
 					mCommentsAdapter.swapCursor(data);

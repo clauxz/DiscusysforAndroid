@@ -1,12 +1,16 @@
 package jp.ac.tohoku.qse.takahashi.discussions.data.odata;
 
+import java.util.List;
+
 import jp.ac.tohoku.qse.takahashi.discussions.data.model.Attachment;
 import jp.ac.tohoku.qse.takahashi.discussions.data.model.Comment;
+import jp.ac.tohoku.qse.takahashi.discussions.data.model.CommentPersonReadEntry;
 import jp.ac.tohoku.qse.takahashi.discussions.data.model.Description;
 import jp.ac.tohoku.qse.takahashi.discussions.data.model.Point;
 import jp.ac.tohoku.qse.takahashi.discussions.data.model.Source;
 import jp.ac.tohoku.qse.takahashi.discussions.data.provider.DiscussionsContract.Attachments;
 import jp.ac.tohoku.qse.takahashi.discussions.data.provider.DiscussionsContract.Comments;
+import jp.ac.tohoku.qse.takahashi.discussions.data.provider.DiscussionsContract.CommentsPersonReadEntry;
 import jp.ac.tohoku.qse.takahashi.discussions.data.provider.DiscussionsContract.Descriptions;
 import jp.ac.tohoku.qse.takahashi.discussions.data.provider.DiscussionsContract.Discussions;
 import jp.ac.tohoku.qse.takahashi.discussions.data.provider.DiscussionsContract.Persons;
@@ -18,16 +22,21 @@ import jp.ac.tohoku.qse.takahashi.discussions.data.provider.DiscussionsContract.
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
+import android.util.Log;
 
 import org.core4j.Enumerable;
+import org.odata4j.core.NamespacedAnnotation;
 import org.odata4j.core.OCreateRequest;
 import org.odata4j.core.OEntity;
 import org.odata4j.core.OEntityId;
 import org.odata4j.core.OEntityIds;
 import org.odata4j.core.OEntityKey;
+import org.odata4j.core.OLink;
 import org.odata4j.core.OModifyRequest;
 import org.odata4j.core.OProperties;
+import org.odata4j.core.OProperty;
 import org.odata4j.core.ORelatedEntityLinkInline;
+import org.odata4j.edm.EdmEntitySet;
 
 public class OdataWriteClient extends BaseOdataClient {
 
@@ -109,7 +118,18 @@ public class OdataWriteClient extends BaseOdataClient {
 				.execute();
 		// @formatter:on
 	}
+	
+	public OEntity insertCommentPersonReadedEntry(final CommentPersonReadEntry commentEntity){
 
+		// @formatter:off
+		return mConsumer.createEntity(CommentsPersonReadEntry.TABLE_NAME)
+				.properties(OProperties.string(CommentsPersonReadEntry.Columns.ID,String.valueOf(commentEntity.getId())))
+				.link(Comments.TABLE_NAME,OEntityKey.parse(String.valueOf(commentEntity.getCommentId())))
+				.link(Persons.TABLE_NAME,OEntityKey.parse(String.valueOf(commentEntity.getPersonId())))
+				.execute();
+		// @formatter:on			
+	}
+	
 	/**
 	 * Used for insert comment without PERSONID.
 	 * </br>

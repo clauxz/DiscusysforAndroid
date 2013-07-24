@@ -10,6 +10,9 @@ import jp.ac.tohoku.qse.takahashi.discussions.R;
 import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
+import android.graphics.BitmapFactory;
+import android.graphics.Color;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.CursorLoader;
@@ -43,13 +46,16 @@ public class AllOtherUserPointListFragment extends SherlockListFragment {
 		initFromIntentExtra();
 		// Create an empty adapter we will use to display the loaded data.
 		mOtherPointsAdapter = new SimpleCursorAdapter(getActivity(), R.layout.list_item_point, null,
-				new String[] { Points.Columns.NAME, Persons.Columns.COLOR, Points.Columns.ORDER_NUMBER },
-				new int[] { R.id.list_item_text, R.id.image_person_color, R.id.text_order_num }, 0);
+				new String[] { Points.Columns.NAME, Persons.Columns.COLOR, Points.Columns.ORDER_NUMBER ,Points.Columns.ISNEW},
+				new int[] { R.id.list_item_text, R.id.image_person_color, R.id.text_order_num, R.id.image_item_new},
+					0);
+		
 		mOtherPointsAdapter.setViewBinder(new ViewBinder() {
 
 			@Override
 			public boolean setViewValue(final View view, final Cursor cursor, final int columnIndex) {
 
+				
 				int viewId = view.getId();
 				switch (viewId) {
 					case R.id.image_person_color:
@@ -63,6 +69,21 @@ public class AllOtherUserPointListFragment extends SherlockListFragment {
 					case R.id.text_order_num:
 						TextView orderNumView = (TextView) view;
 						orderNumView.setText(cursor.getString(columnIndex));
+						return true;
+					case R.id.image_item_new:
+						{
+							int index=cursor.getColumnIndex(Points.Columns.ISNEW);
+							int isNew=cursor.getInt(index);
+							
+							if(ApplicationConstants.OBJECT_NEW==isNew){
+								((ImageView)view).setImageBitmap(
+										BitmapFactory.decodeResource(getResources(), R.drawable.ic_data_changed));
+							}
+							else
+							{
+								((ImageView)view).setImageBitmap(null);
+							}
+						}
 						return true;
 					default:
 						return false;
@@ -152,8 +173,10 @@ public class AllOtherUserPointListFragment extends SherlockListFragment {
 				case LOADER_OTHER_POINTS_ID: {
 					String where = Points.Columns.TOPIC_ID + "=? AND " + Points.Columns.PERSON_ID
 							+ "!=? AND " + Points.Columns.PERSON_ID + "=" + Persons.Qualified.PERSON_ID;
+					
 					String[] args = { String.valueOf(mTopicId), String.valueOf(mOriginPersonId) };
 					String sortOrder = Points.Columns.PERSON_ID + "," + Points.Columns.ORDER_NUMBER + " ASC";
+					
 					return new CursorLoader(getActivity(), Points.CONTENT_AND_PERSON_URI, null, where, args,
 							sortOrder);
 				}
@@ -177,6 +200,7 @@ public class AllOtherUserPointListFragment extends SherlockListFragment {
 		@Override
 		public void onLoadFinished(final Loader<Cursor> loader, final Cursor data) {
 
+						
 			switch (loader.getId()) {
 				case LOADER_OTHER_POINTS_ID:
 					mOtherPointsAdapter.swapCursor(data);
@@ -184,6 +208,7 @@ public class AllOtherUserPointListFragment extends SherlockListFragment {
 				default:
 					throw new IllegalArgumentException("Unknown loader id: " + loader.getId());
 			}
+			
 		}
 	}
 }
