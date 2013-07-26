@@ -108,7 +108,7 @@ public class DiscussionsDatabase extends SQLiteOpenHelper {
 				+ Comments.Columns.TEXT + " TEXT NOT NULL,"
 				+ Comments.Columns.PERSON_ID + " INTEGER, " 
 				+ Comments.Columns.POINT_ID + " INTEGER, " 
-				+ Comments.Columns.ISNEW + " INTEGER, "   //new column, new old comment
+				//+ Comments.Columns.ISNEW + " INTEGER, "   //new column, new old comment
 				+ " UNIQUE (" + Comments.Columns.ID + ") ON CONFLICT REPLACE)";
 		
 		Log.i("Disc CREATE COMMENT",commentSQL);
@@ -192,7 +192,7 @@ public class DiscussionsDatabase extends SQLiteOpenHelper {
 				+ Attachments.Columns.LINK + " TEXT,"
 				+ Attachments.Columns.TITLE + " TEXT,"
 				+ Attachments.Columns.ORDER_NUMBER + " NOT NULL,"
-				+ Attachments.Columns.ISNEW + " INTEGER, "
+				//+ Attachments.Columns.ISNEW + " INTEGER, "
 				+ " UNIQUE (" + Attachments.Columns.ID + ") ON CONFLICT REPLACE)";
 		
 		Log.i("Disc CREATE ATTACHEMNT", attachemntSQL);

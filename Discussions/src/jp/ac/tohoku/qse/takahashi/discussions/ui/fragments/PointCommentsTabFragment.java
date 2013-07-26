@@ -15,6 +15,7 @@ import jp.ac.tohoku.qse.takahashi.discussions.data.provider.DiscussionsProvider;
 import jp.ac.tohoku.qse.takahashi.discussions.data.provider.SelectionBuilder;
 import jp.ac.tohoku.qse.takahashi.discussions.ui.ExtraKey;
 import jp.ac.tohoku.qse.takahashi.discussions.ui.activities.BaseActivity;
+import jp.ac.tohoku.qse.takahashi.discussions.utils.MyLog;
 import jp.ac.tohoku.qse.takahashi.discussions.utils.TextViewUtils;
 
 import jp.ac.tohoku.qse.takahashi.discussions.R;
@@ -185,7 +186,7 @@ public class PointCommentsTabFragment extends SherlockFragment implements OnClic
 
 		Cursor cursor = (Cursor) mCommentsAdapter.getItem(position - 1);
 		int commentIdIndex = cursor.getColumnIndexOrThrow(Comments.Columns.ID);
-		int commentIsNewIndex=cursor.getColumnIndex(Comments.Columns.ISNEW);
+		int commentIsNewIndex=cursor.getColumnIndex(Comments.Columns.IsReadedFlag);
 		int commentId = cursor.getInt(commentIdIndex);
 		int commentIsNew=cursor.getInt(commentIsNewIndex);
 		Uri commentUri = Comments.buildTableUri(commentId);
@@ -342,7 +343,7 @@ public class PointCommentsTabFragment extends SherlockFragment implements OnClic
 	private void setUpCommentsAdapter() {
 
 		mCommentsAdapter = new SimpleCursorAdapter(getActivity(), R.layout.list_item_comments, null,
-				new String[] { Persons.Columns.NAME, Comments.Columns.TEXT, Persons.Columns.COLOR,Comments.Columns.ISNEW },
+				new String[] { Persons.Columns.NAME, Comments.Columns.TEXT, Persons.Columns.COLOR, Comments.Columns.IsReadedFlag },
 				new int[] { R.id.text_comment_person_name, R.id.text_comment, R.id.image_person_color,
 			R.id.image_comment_item_new }, 0);
 		mCommentsAdapter.setViewBinder(new ViewBinder() {
@@ -350,6 +351,14 @@ public class PointCommentsTabFragment extends SherlockFragment implements OnClic
 			@Override
 			public boolean setViewValue(final View view, final Cursor cursor, final int columnIndex) {
 
+				for(String name:cursor.getColumnNames()){
+					int index=cursor.getColumnIndex(name);
+					String value=cursor.getString(index);
+					Log.i("Disc comment","column:"+String.valueOf(index)
+							+" "+name+" "+value);
+				}
+				Log.i("------------","-------------------");
+				
 				switch (view.getId()) {
 					case R.id.image_person_color:
 						ImageView colorView = (ImageView) view;
@@ -365,10 +374,8 @@ public class PointCommentsTabFragment extends SherlockFragment implements OnClic
 						return true;
 					case R.id.image_comment_item_new:
 					{
-						int index=cursor.getColumnIndex(Points.Columns.ISNEW);
+						int index=cursor.getColumnIndex(Comments.Columns.IsReadedFlag);
 						int isNew=cursor.getInt(index);
-						
-						Log.i("Disc setViewValue","COMMENT ISNEW:"+String.valueOf(isNew));
 						
 						if(ApplicationConstants.OBJECT_NEW==isNew){
 							((ImageView)view).setImageBitmap(
@@ -456,7 +463,8 @@ public class PointCommentsTabFragment extends SherlockFragment implements OnClic
 			switch (loaderId) {
 				case COMMENTS_ID: {
 					String where = Comments.Columns.POINT_ID + "=?";
-					String[] args = new String[] { String.valueOf(myPointId) };
+					String[] args = new String[] { String.valueOf(myPointId),
+							String.valueOf(mLoggedInPersonId) };
 					return new CursorLoader(getActivity(), Comments.CONTENT_URI, null, where, args, null);
 				}
 				case POINT_NAME_ID: {

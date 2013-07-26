@@ -5,6 +5,7 @@ import android.content.ContentUris;
 import android.content.Context;
 import android.net.Uri;
 import android.provider.BaseColumns;
+import android.util.Log;
 
 import java.util.List;
 
@@ -164,8 +165,6 @@ public final class DiscussionsContract {
 			public static final String VIDEO_THUMB_URL = "VideoThumbURL";
 			/** Type Int32. */
 			public static final String ORDER_NUMBER = "OrderNumber";
-			/** Type Int. */
-			public static final String ISNEW = "IsNew";
 		}
 	}
 
@@ -234,10 +233,8 @@ public final class DiscussionsContract {
 			public static final String POINT_ID = "Point";
 			/** Type String. */
 			public static final String TEXT = "Text";
-			/** Type Int. */
-			public static final String ISNEW="IsNew";
 			/** used only in complex query , column does not exist in table. It's virtual column */
-			public static final String Flag="Flag";
+			public static final String IsReadedFlag="IsReadedFlag";
 		}
 
 		/** {@link ScheduleContract} fields that are fully qualified with a specific parent table. Used when
@@ -303,7 +300,6 @@ public final class DiscussionsContract {
 		 *            a uri that contains value id
 		 * @return a unique identifier provided by table uri */
 		public static String getValueId(final Uri uri) {
-
 			return uri.getPathSegments().get(1);
 		}
 		

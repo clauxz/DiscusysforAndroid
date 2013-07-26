@@ -181,15 +181,15 @@ public class CommentDetailsActivity extends BaseActivity implements PhotonServic
 		Bundle commentValues=new Bundle();
 		commentValues.putInt(CommentsPersonReadEntry.Columns.COMMENT_ID, mSelectedCommentId);
 		commentValues.putInt(CommentsPersonReadEntry.Columns.PERSON_ID, mLoggedPersonID);
-
+		//*
 		Log.i("Disc markReadedComment","commentValues:"+String.valueOf(commentValues));
 		Log.i("Disc markReadedComment","mSelectedPoint:"+String.valueOf(mSelectedPoint));
 		//mConnection
 		//mService
 		Log.i("Disc markReadedComment","mConnection:"+String.valueOf(mConnection));
 		Log.i("Disc markReadedComment","mService:"+String.valueOf(mService));
-		
 		Log.i("Disc markReadedComment","getServiceHelper():"+String.valueOf(getServiceHelper()));
+		//*/
 		
 		getServiceHelper().insertCommentPersonReadedEntry(commentValues, mSelectedPoint);
 		

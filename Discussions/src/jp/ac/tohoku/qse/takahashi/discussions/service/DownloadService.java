@@ -291,6 +291,7 @@ public class DownloadService extends IntentService {
 		logd("[downloadPointsFromTopic] topic id: " + topicId);
 		OdataReadClientWithBatchTransactions odata = new OdataReadClientWithBatchTransactions(this);
 		odata.updateTopicPoints(topicId);
+		odata.refreshCommentsPersonEntry();
 		odata.applyBatchOperations();
 	}
 
@@ -348,6 +349,7 @@ public class DownloadService extends IntentService {
 		logd("[updatePoint] point id: " + pointId);
 		OdataReadClientWithBatchTransactions odata = new OdataReadClientWithBatchTransactions(this);
 		odata.updatePoint(pointId);
+		odata.refreshCommentsPersonEntry();
 		odata.applyBatchOperations();
 	}
 
@@ -377,8 +379,10 @@ public class DownloadService extends IntentService {
 		int sourcesCount = 10;
 		int descriptionCount = 10;
 		int commentsCount = 10;
+		int commentsPersonEntity=10;
+		
 		int totalCount = seatsCount + personsCount + discussionsCount + pointsCount + topicsCount
-				+ attachmentsCount + sourcesCount + descriptionCount + commentsCount;
+				+ attachmentsCount + sourcesCount + descriptionCount + commentsCount+commentsPersonEntity;
 		ActivityResultHelper.sendStatusStartWithCount(activityReceiver, totalCount);
 		ActivityResultHelper.sendProgress(activityReceiver, getString(R.string.progress_downloading_seats),
 				downloadedCount);
@@ -460,6 +464,16 @@ public class DownloadService extends IntentService {
 		//
 		odataClient.refreshSources();
 		logd("[downloadPerSession] sources completed");
+		
+		
+		//comments person readed  entities
+		ActivityResultHelper.sendProgress(activityReceiver, getString(R.string.progress_downloading_commentpersonentity),
+				downloadedCount);
+		odataClient.refreshCommentsPersonEntry();
+		logd("[downloadPerSession] comments person read entities compleated");
+		downloadedCount+=commentsPersonEntity;
+		
+		
 		odataClient.applyBatchOperations();
 		downloadedCount += sourcesCount;
 		ActivityResultHelper.sendProgress(activityReceiver,

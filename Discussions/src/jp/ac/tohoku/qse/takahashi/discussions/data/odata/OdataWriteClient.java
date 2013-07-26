@@ -121,6 +121,9 @@ public class OdataWriteClient extends BaseOdataClient {
 	
 	public OEntity insertCommentPersonReadedEntry(final CommentPersonReadEntry commentEntity){
 
+		//delete pointers on comment
+		deleteCommentPersonReadEntityByCommentIDPersonID(commentEntity.getCommentId(), commentEntity.getPersonId());
+		
 		// @formatter:off
 		return mConsumer.createEntity(CommentsPersonReadEntry.TABLE_NAME)
 				.properties(OProperties.string(CommentsPersonReadEntry.Columns.ID,String.valueOf(commentEntity.getId())))
@@ -341,11 +344,50 @@ public class OdataWriteClient extends BaseOdataClient {
 		Cursor commentsCursor = mContentResolver.query(Comments.CONTENT_URI, projection, where, null, null);
 		for (commentsCursor.moveToFirst(); !commentsCursor.isAfterLast(); commentsCursor.moveToNext()) {
 			int commentId = commentsCursor.getInt(commentsCursor.getColumnIndexOrThrow(Comments.Columns.ID));
+			deleteCommentPersonReadEntityByCommentID(commentId);
 			mConsumer.deleteEntity(Comments.TABLE_NAME, commentId).execute();
 		}
 		commentsCursor.close();
 	}
 
+	/**
+	 * Delete CommentsPersonReadEnttity row using commentID and personID.
+	 * @param commentId
+	 * @param personId
+	 */
+	private void deleteCommentPersonReadEntityByCommentIDPersonID(final int commentId,final int personId){
+		String[] projection = new String[] { CommentsPersonReadEntry.Columns.ID };
+		String where=CommentsPersonReadEntry.Columns.COMMENT_ID+" = "+commentId+" AND "
+				+CommentsPersonReadEntry.Columns.PERSON_ID+" = "+personId;
+		Cursor comPersonReadEntry=mContentResolver.query(CommentsPersonReadEntry.CONTENT_URI,
+				projection, where, null, null);
+		
+		for(comPersonReadEntry.moveToFirst();!comPersonReadEntry.isAfterLast();comPersonReadEntry.moveToNext()){
+			int comPersonEntryID=comPersonReadEntry.getInt(
+					comPersonReadEntry.getColumnIndexOrThrow(CommentsPersonReadEntry.Columns.ID));
+			mConsumer.deleteEntity(CommentsPersonReadEntry.TABLE_NAME,comPersonEntryID).execute();
+		}
+		comPersonReadEntry.close();		
+	}
+	/**
+	 * Delete CommentPersonReadEntry row by CommentId.
+	 * @param commentId which comment mark need to delete
+	 */
+	private void deleteCommentPersonReadEntityByCommentID(final int commentId){
+		String[] projection = new String[] { CommentsPersonReadEntry.Columns.ID };
+		String where=CommentsPersonReadEntry.Columns.COMMENT_ID+" = "+commentId;
+		Cursor comPersonReadEntry=mContentResolver.query(CommentsPersonReadEntry.CONTENT_URI,
+				projection, where, null, null);
+		
+		for(comPersonReadEntry.moveToFirst();!comPersonReadEntry.isAfterLast();comPersonReadEntry.moveToNext()){
+			int comPersonEntryID=comPersonReadEntry.getInt(
+					comPersonReadEntry.getColumnIndexOrThrow(CommentsPersonReadEntry.Columns.ID));
+			mConsumer.deleteEntity(CommentsPersonReadEntry.TABLE_NAME,comPersonEntryID).execute();
+		}
+		comPersonReadEntry.close();		
+	}
+	
+	
 	private void deleteDescriptionByPointId(final int pointId) {
 
 		String[] projection = new String[] { Descriptions.Columns.ID };

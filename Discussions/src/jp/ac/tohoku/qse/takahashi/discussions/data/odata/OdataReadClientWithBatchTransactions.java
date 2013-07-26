@@ -403,9 +403,6 @@ public class OdataReadClientWithBatchTransactions extends BaseOdataClient {
 	
 	//check expand tables Poins and Person
 	private Enumerable<OEntity> getCommentsPersonEntryEntities(){
-		
-		Log.i("Disc","*** getCommentsPersonEntryEntities");
-		
 		return mConsumer.getEntities(CommentsPersonReadEntry.TABLE_NAME)
 				.expand(Persons.TABLE_NAME + "," + Comments.TABLE_NAME).execute();
 	}
@@ -429,9 +426,6 @@ public class OdataReadClientWithBatchTransactions extends BaseOdataClient {
 	
 	//check expand tables Poins and Person
 	private Enumerable<OEntity> getFilteredCommentsPersonEntryEntities(){
-
-		Log.i("Disc","@@@ getFilteredCommentsPersonEntryEntities");
-		
 		return mConsumer.getEntities(CommentsPersonReadEntry.TABLE_NAME)
 				.expand(Persons.TABLE_NAME + "," + Comments.TABLE_NAME).filter(
 						"Person/Id ne null and Comment/Id ne null").execute();
@@ -490,7 +484,7 @@ public class OdataReadClientWithBatchTransactions extends BaseOdataClient {
 			ContentValues cv = OEntityToContentValue(attachment);
 			cv.put(Attachments.Columns.POINT_ID, getAsInt(point, Points.Columns.ID));
 			
-			cv.put(Attachments.Columns.ISNEW,1);
+			//cv.put(Attachments.Columns.ISNEW,1);
 			
 			insertValues(Attachments.CONTENT_URI, cv);
 		} else {
@@ -500,7 +494,7 @@ public class OdataReadClientWithBatchTransactions extends BaseOdataClient {
 				ContentValues cv = OEntityToContentValue(attachment);
 				cv.put(Attachments.Columns.DISCUSSION_ID, getAsInt(discussion, Discussions.Columns.ID));
 				
-				cv.put(Attachments.Columns.ISNEW,1);
+				//cv.put(Attachments.Columns.ISNEW,1);
 				
 				insertValues(Attachments.CONTENT_URI, cv);
 			} else {
@@ -519,7 +513,6 @@ public class OdataReadClientWithBatchTransactions extends BaseOdataClient {
 			ContentValues cv = OEntityToContentValue(comment);
 			cv.put(Comments.Columns.POINT_ID, getAsInt(point, Points.Columns.ID));
 			cv.put(Comments.Columns.PERSON_ID, getAsInt(person, Persons.Columns.ID));
-			cv.put(Comments.Columns.ISNEW, 1); //1 new comment
 			
 			Log.i("Disc insertComment","ContentValues: "+String.valueOf(cv.toString()));
 			
@@ -688,17 +681,6 @@ public class OdataReadClientWithBatchTransactions extends BaseOdataClient {
 		
 		deleteValues(Comments.CONTENT_URI, selection, args);
 		for (OEntity comment : comments) {
-			
-			/*
-			for(OProperty property:comment.getProperties()){
-				//if(property.getName().equals(Comments.Columns.ISNEW))
-				
-				{
-					Log.i("Disc comment property",String.valueOf(property.getName())+" "+String.valueOf(property));
-				}
-			}		
-			//*/
-			
 			insertComment(comment);
 		}
 		logd("[updatePointComments] all comments was inserted");

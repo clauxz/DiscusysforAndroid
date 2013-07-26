@@ -7,41 +7,56 @@
 
     <!-- android:minHeight="48dp" -->
 
-    <ImageView
-        android:id="@+id/image_person_color"
-        android:layout_width="10dp"
-        android:layout_height="match_parent"
-        android:layout_marginBottom="4dp"
-        android:layout_marginTop="4dp" />
-
-    <TextView
-        android:id="@+id/text_comment_person_name"
-        style="@style/ListItemTextSingleLine"
-        android:layout_gravity="center_vertical"
-        android:layout_marginBottom="4dp"
-        android:layout_marginLeft="4dp"
-        android:layout_marginTop="4dp" />
-
-    <TextView
-        android:id="@+id/text_comment"
-        style="@style/ListItemTextSingleLine"
-        android:layout_gravity="center_vertical"
-        android:layout_marginBottom="4dp"
-        android:layout_marginRight="4dp"
-        android:layout_marginTop="4dp"
-        android:layout_weight="1"/>
+		    
+		<RelativeLayout 
+		    android:layout_height="match_parent"
+		    android:layout_width="match_parent"
+		    android:layout_weight="1">
+		    
+		    <LinearLayout 
+		        android:layout_height="wrap_content"
+		        android:layout_width="match_parent"
+		        android:layout_centerVertical="true">
+		        
+		        <ImageView
+			        android:id="@+id/image_person_color"
+			        android:layout_width="10dp"
+			        android:layout_height="match_parent"
+			        android:layout_marginBottom="4dp"
+			        android:layout_marginTop="4dp" />
+			
+			    <TextView
+			        android:id="@+id/text_comment_person_name"
+			        style="@style/ListItemTextSingleLine"
+			        android:layout_gravity="center_vertical"
+			        android:layout_marginBottom="4dp"
+			        android:layout_marginLeft="4dp"
+			        android:layout_marginTop="4dp"/>
+			
+			    <TextView
+			        android:id="@+id/text_comment"
+			        style="@style/ListItemTextSingleLine"
+			        android:layout_gravity="center_vertical"
+			        android:layout_marginBottom="4dp"
+			        android:layout_marginRight="4dp"
+			        android:layout_marginTop="4dp"/>		        
+		    </LinearLayout>
+		</RelativeLayout>
     
-    <RelativeLayout 
-        android:layout_width="17dp"
-        android:layout_height="match_parent">
-        <ImageView 
-            android:id="@+id/image_comment_item_new"
-            android:layout_width="10dp"
-            android:layout_height="10dp"
-            android:layout_centerVertical="true"
-            android:layout_alignParentRight="true"
-            android:layout_marginTop="7dp"
-            android:layout_marginRight="7dp"/>
-    </RelativeLayout>
+    
+	    <RelativeLayout 
+	        android:layout_width="17dp"
+	        android:layout_height="match_parent">
+		    
+	        <ImageView 
+	            android:id="@+id/image_comment_item_new"
+	            android:layout_width="10dp"
+	            android:layout_height="10dp"
+	            android:layout_centerVertical="true"
+	            android:layout_alignParentRight="true"
+	            android:layout_marginTop="7dp"
+	            android:layout_marginRight="7dp"
+	            android:src="@drawable/ic_data_changed"/>
+	    </RelativeLayout>
 
 </LinearLayout>

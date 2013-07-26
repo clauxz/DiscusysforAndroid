@@ -68,6 +68,7 @@ public class OtherUserPointListFragment extends SherlockListFragment {
 						return true;
 					case R.id.image_item_new:
 					{
+						/*
 						int index=cursor.getColumnIndex(Points.Columns.ISNEW);
 						int isNew=cursor.getInt(index);
 						
@@ -79,6 +80,7 @@ public class OtherUserPointListFragment extends SherlockListFragment {
 						{
 							((ImageView)view).setImageBitmap(null);
 						}
+						//*/
 					}
 					default:
 						return false;

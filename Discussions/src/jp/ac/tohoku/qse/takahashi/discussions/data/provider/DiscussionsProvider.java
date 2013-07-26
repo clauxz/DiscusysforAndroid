@@ -529,15 +529,25 @@ public class DiscussionsProvider extends ContentProvider {
 			}
 			case COMMENTS_DIR: {
 				Log.i("Disc DiscussionsProvider","COMMENTS_DIR");
+				//*
+				for(String str:selectionArgs){
+					Log.i("Disc","selectionArgs:"+str);
+				}
+				//*/
+				
+				String[] selectionArgs2={selectionArgs[0]};
+				String loggedPerson=selectionArgs[1];
+				
+				/*
 				builder.table(Comments.TABLE_NAME + "," + Persons.TABLE_NAME);
 				builder.mapToTable(BaseColumns._ID, Comments.TABLE_NAME).mapToTable(Comments.Columns.ID,
 						Comments.TABLE_NAME);
 				if (selectionArgs != null) {
 					builder.where(Comments.Columns.POINT_ID + "=? AND " + Comments.Columns.PERSON_ID + "="
-							+ Persons.Qualified.PERSON_ID, selectionArgs);
+							+ Persons.Qualified.PERSON_ID, selectionArgs2);
 				} else {
 					builder.where(selection, (String[]) null);
-				}
+				}				
 				
 				Cursor  c = builder.query(db, new String[] { 
 						BaseColumns._ID, 
@@ -549,13 +559,37 @@ public class DiscussionsProvider extends ContentProvider {
 						Comments.Columns.POINT_ID, 
 						"(CASE WHEN EXISTS( SELECT * FROM "+CommentsPersonReadEntry.TABLE_NAME
 						+" WHERE "+CommentsPersonReadEntry.Columns.COMMENT_ID+"="+Comments.Columns.ID+" AND "
-						+CommentsPersonReadEntry.Columns.PERSON_ID+"=2 )=1 THEN 1 ELSE 0 END ) "
+						+CommentsPersonReadEntry.Columns.PERSON_ID+"="+loggedPerson+" )=1 THEN 0 ELSE 1 END ) "
 						+" AS "+Comments.Columns.ISNEW
 						}
 						,Comments.Qualified.COMMENT_ID, null, sortOrder, null);
+				//*/
+				String sql="SELECT Comment._Id, Comment.Id, Text, Name, Color, Person, Point,IsNew,"
+						+" (CASE WHEN EXISTS( SELECT * FROM "+CommentsPersonReadEntry.TABLE_NAME
+						+" WHERE "+CommentsPersonReadEntry.Columns.COMMENT_ID+"="+Comments.Columns.ID+" AND "
+						+CommentsPersonReadEntry.Columns.PERSON_ID+"="+loggedPerson+" )=1 THEN 0 ELSE 1 END ) "
+						+" AS 'Flag'"//+Comments.Columns.ISNEW
+						+" FROM "+Comments.TABLE_NAME+","+Persons.TABLE_NAME
+						+" WHERE "+Comments.Columns.POINT_ID+"=?"
+						+" AND Person=Person.Id";
+					
+				//the right SQL selection script
+				String sql2="SELECT Comment._Id, Comment.Id, Text, Name, Color, Person, Point,"
+							+" (CASE WHEN EXISTS( SELECT * FROM  CommentPersonReadEntry"
+							+" WHERE CommentPersonReadEntry.Comment_Id=Comment.Id  AND  CommentPersonReadEntry.Person_Id=3 )=1 THEN 0 ELSE 1 END ) " 
+							+" AS "+Comments.Columns.IsReadedFlag 
+							+" FROM  Comment,Person "
+							+" WHERE "
+							+" Point=? AND Person=Person.Id"; 
+		
+				Log.i("Disc Comment SQL",sql2);
+						
+				Cursor c=db.rawQuery(sql2, selectionArgs2);
+				
 				notificationUri = Comments.CONTENT_URI;
 				c.setNotificationUri(getContext().getContentResolver(), notificationUri);
 				Log.i("Disc","COMMENT:"+builder.getSelection());								
+				
 				return c;
 			}
 			
