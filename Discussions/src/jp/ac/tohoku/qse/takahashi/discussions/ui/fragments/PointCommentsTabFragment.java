@@ -1,9 +1,16 @@
 package jp.ac.tohoku.qse.takahashi.discussions.ui.fragments;
 
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.logging.Handler;
+import java.util.logging.LogRecord;
+
 import javax.ws.rs.core.UriBuilder;
 
 import jp.ac.tohoku.qse.takahashi.discussions.ApplicationConstants;
 import jp.ac.tohoku.qse.takahashi.discussions.data.model.Comment;
+import jp.ac.tohoku.qse.takahashi.discussions.data.model.CommentPersonReadEntry;
 import jp.ac.tohoku.qse.takahashi.discussions.data.model.SelectedPoint;
 import jp.ac.tohoku.qse.takahashi.discussions.data.provider.DiscussionsContract;
 import jp.ac.tohoku.qse.takahashi.discussions.data.provider.DiscussionsContract.Attachments;
@@ -15,12 +22,16 @@ import jp.ac.tohoku.qse.takahashi.discussions.data.provider.DiscussionsProvider;
 import jp.ac.tohoku.qse.takahashi.discussions.data.provider.SelectionBuilder;
 import jp.ac.tohoku.qse.takahashi.discussions.ui.ExtraKey;
 import jp.ac.tohoku.qse.takahashi.discussions.ui.activities.BaseActivity;
+import jp.ac.tohoku.qse.takahashi.discussions.ui.activities.PointDetailsActivity;
 import jp.ac.tohoku.qse.takahashi.discussions.utils.MyLog;
+import jp.ac.tohoku.qse.takahashi.discussions.utils.NotificationComment;
+import jp.ac.tohoku.qse.takahashi.discussions.utils.NotificationPoint;
 import jp.ac.tohoku.qse.takahashi.discussions.utils.TextViewUtils;
 
 import jp.ac.tohoku.qse.takahashi.discussions.R;
 
 import android.content.Intent;
+import android.content.UriMatcher;
 import android.database.Cursor;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
@@ -47,6 +58,7 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.actionbarsherlock.app.SherlockFragment;
 
@@ -67,8 +79,19 @@ public class PointCommentsTabFragment extends SherlockFragment implements OnClic
 	private int mSessionId;
 	//private int mTopicID;
 	//map of readed comments
+	NotificationComment notificationComment;
 	
-
+	
+	android.os.Handler deleteTimer=new android.os.Handler(){
+		@Override
+		public void handleMessage(android.os.Message msg) {
+			
+			onInsertCommentReadEntry();
+		};
+	};
+	
+	
+	
 	public PointCommentsTabFragment() {
 
 		// initialize default values
@@ -85,6 +108,11 @@ public class PointCommentsTabFragment extends SherlockFragment implements OnClic
 		addCommentsHeader(inflater);
 		addCommentsFooter(inflater);
 		initFromArguments();
+		//initReadedComments();
+		updateCommentsStatus();
+		
+		deleteTimer.sendEmptyMessageDelayed(0, 5*1000);
+		
 		return mCommentsList;
 	}
 
@@ -97,54 +125,15 @@ public class PointCommentsTabFragment extends SherlockFragment implements OnClic
 		populateSavedInstanceState(savedInstanceState);
 		setUpCommentsAdapter();
 		initCommentsLoader();
-		
-		//initReadedComments();
+			
 	}
-	
+	/*
 	private void initReadedComments(){
 		
-		Log.i("Disc","initReadedComments");
-		
-		Uri uri=Uri.parse(CommentsPersonReadEntry.A_TABLE_PREFIX);
-		
-		SelectionBuilder builder = new SelectionBuilder();
-		
-		DiscussionsProvider provider=(DiscussionsProvider)getActivity().getContentResolver()
-				.acquireContentProviderClient(
-						DiscussionsContract.CONTENT_AUTHORITY)
-						.getLocalContentProvider();
-		
-		
-		if(provider!=null)
-		{
-			Log.i("Disc","Provider:"+provider.toString());
-			
-			Cursor cursor=provider.query(uri, 
-							new String[]{
-								BaseColumns._ID,
-								CommentsPersonReadEntry.Columns.ID,
-								CommentsPersonReadEntry.Columns.COMMENT_ID,
-								CommentsPersonReadEntry.Columns.PERSON_ID}, 
-							CommentsPersonReadEntry.Columns.PERSON_ID+"=" + String.valueOf(mLoggedInPersonId),
-							new String[] {String.valueOf(mLoggedInPersonId)},
-							CommentsPersonReadEntry.Columns.ID+" ASC");
-			
-			if(cursor!=null){
-				Log.i("Disc","Cursor size:"+String.valueOf(cursor.getCount()));
-				
-				cursor.moveToFirst();
-			}
-			else
-			{
-				Log.i("Disc","Cursor = null");
-			}
-		}
-		else{
-			Log.i("Disc","Provider null");
-		}
-		
+		notificationComment=new NotificationComment(getActivity(),mLoggedInPersonId);
 			
 	}
+	//*/
 
 
 	@Override
@@ -335,15 +324,77 @@ public class PointCommentsTabFragment extends SherlockFragment implements OnClic
 		int columnIndex = cursor.getColumnIndexOrThrow(Comments.Columns.ID);
 		int commentId = cursor.getInt(columnIndex);
 		((BaseActivity) getActivity()).getServiceHelper().deleteComment(commentId, mSelectedPoint);
+		//*/
+		
 		
 	}
 	
+	protected void onInsertCommentReadEntry(){
+		
+		Log.i("Disc","Add CommentsReadedPersonEntitires ARRAY");
+		Cursor cursor=mCommentsAdapter.getCursor();
+		
+		if(cursor!=null)// && 0<cursor.getCount())
+		{
+			if(0<cursor.getCount())
+			{
+				cursor.moveToFirst();
+				ArrayList<Integer> comments=new ArrayList<Integer>();
+				
+				while(cursor.moveToNext()){
+					int indexId=cursor.getColumnIndexOrThrow(Comments.Columns.ID);
+					int indexCommentPoint=cursor.getColumnIndexOrThrow(Comments.Columns.POINT_ID);
+					
+					int id=cursor.getInt(indexId);
+					int pointId=cursor.getInt(indexCommentPoint);
+					
+					if(pointId==mSelectedPoint.getPointId())
+					{
+						if(!notificationComment.IsPersonReadedComment(mLoggedInPersonId,id))
+						{
+							comments.add(id);
+						}
+					}				
+				}
+				
+				Log.i("Disc","ADD arr comments list SIZE:"+String.valueOf(comments.size()));
+				
+				if(0<comments.size())
+				{
+					Bundle commentValues=new Bundle();
+					commentValues.putInt(CommentsPersonReadEntry.Columns.PERSON_ID, mLoggedInPersonId);
+					//commentValues.putInt(CommentsPersonReadEntry.Columns.PERSON_ID, mLoggedInPersonId);
+					
+					int[] dataArr=new int[comments.size()];
+					for(int i=0;i<comments.size();i++){
+						dataArr[i]=comments.get(i);
+					}
+					
+					Log.i("Disc","ADD arr comments arr LENTH:"+String.valueOf(dataArr.length));
+					
+					((BaseActivity) getActivity()).getServiceHelper()
+						.insertCommentPersonReadedEntities(commentValues, mSelectedPoint,dataArr);
+					
+					mCommentsAdapter.notifyDataSetChanged();
+				}
+			}
+			else
+			{
+				Log.i("Disc","ADD arr CURSOR SIZE:"+String.valueOf(cursor.getCount()));
+			}
+		}
+		else
+		{
+			Log.i("Disc","ADD arr CURSOR NULL");
+		}
+		
+	}
 		
 	
 	private void setUpCommentsAdapter() {
 
 		mCommentsAdapter = new SimpleCursorAdapter(getActivity(), R.layout.list_item_comments, null,
-				new String[] { Persons.Columns.NAME, Comments.Columns.TEXT, Persons.Columns.COLOR, Comments.Columns.IsReadedFlag },
+				new String[] { Persons.Columns.NAME, Comments.Columns.TEXT, Persons.Columns.COLOR, Comments.Columns.ID },
 				new int[] { R.id.text_comment_person_name, R.id.text_comment, R.id.image_person_color,
 			R.id.image_comment_item_new }, 0);
 		mCommentsAdapter.setViewBinder(new ViewBinder() {
@@ -351,6 +402,7 @@ public class PointCommentsTabFragment extends SherlockFragment implements OnClic
 			@Override
 			public boolean setViewValue(final View view, final Cursor cursor, final int columnIndex) {
 
+				/*
 				for(String name:cursor.getColumnNames()){
 					int index=cursor.getColumnIndex(name);
 					String value=cursor.getString(index);
@@ -358,6 +410,7 @@ public class PointCommentsTabFragment extends SherlockFragment implements OnClic
 							+" "+name+" "+value);
 				}
 				Log.i("------------","-------------------");
+				//*/
 				
 				switch (view.getId()) {
 					case R.id.image_person_color:
@@ -374,6 +427,18 @@ public class PointCommentsTabFragment extends SherlockFragment implements OnClic
 						return true;
 					case R.id.image_comment_item_new:
 					{
+						int indexId=cursor.getColumnIndexOrThrow(Comments.Columns.ID);
+						int id=cursor.getInt(indexId);
+						
+						if(!notificationComment.IsPersonReadedComment(mLoggedInPersonId, id)){
+							((ImageView)view).setImageBitmap(
+									BitmapFactory.decodeResource(getResources(), R.drawable.ic_data_changed));
+						}
+						else
+						{
+							((ImageView)view).setImageBitmap(null);
+						}
+						/*
 						int index=cursor.getColumnIndex(Comments.Columns.IsReadedFlag);
 						int isNew=cursor.getInt(index);
 						
@@ -385,6 +450,7 @@ public class PointCommentsTabFragment extends SherlockFragment implements OnClic
 						{
 							((ImageView)view).setImageBitmap(null);
 						}
+						//*/
 					}
 					return true;
 					default:
@@ -434,6 +500,79 @@ public class PointCommentsTabFragment extends SherlockFragment implements OnClic
 		return arguments;
 	}
 
+	
+	public void updateCommentsStatus(){
+		
+		notificationComment=new NotificationComment(getActivity(),mLoggedInPersonId);
+		
+		if(getActivity() instanceof PointDetailsActivity){
+			boolean com=false;
+			
+			if(mCommentsAdapter!=null)
+			{
+				Cursor cursor=mCommentsAdapter.getCursor();
+				
+				if(cursor!=null)// && 0<cursor.getCount())
+				{
+					if(0<cursor.getCount())
+					{
+					cursor.moveToFirst();
+					do
+					{
+						int indexId=cursor.getColumnIndexOrThrow(Comments.Columns.ID);
+						int indexCommentPoint=cursor.getColumnIndexOrThrow(Comments.Columns.POINT_ID);
+						
+						int id=cursor.getInt(indexId);
+						int pointId=cursor.getInt(indexCommentPoint);
+						
+						if(pointId==mSelectedPoint.getPointId())
+						{
+							if(!notificationComment.IsPersonReadedComment(mLoggedInPersonId,id))
+							{
+								com=true;
+								((PointDetailsActivity)getActivity()).setNewComments(com);
+								//((PointDetailsActivity)getActivity()).updateCommentIcon();
+								
+								Log.i("++++++++++++++++",String.valueOf(com));
+								return;
+							}
+						}
+						
+					}while(cursor.moveToNext());
+					}
+					else
+					{
+						Log.i("Disc updateComment","cursor size:"+String.valueOf(cursor.getCount()));
+					}
+				}
+				else
+				{
+					Log.i("Disc updateComment","cursor NULL");
+				}
+			}
+			else
+			{
+				Log.i("Disc updateComment","mCommentsAdapter NULL");
+			}
+			Log.i("--------------",String.valueOf(com));
+			
+			((PointDetailsActivity)getActivity()).setNewComments(com);
+			//((PointDetailsActivity)getActivity()).updateCommentIcon();
+		}		
+	}
+	
+	public void notifyFragmentCommentsChanged(){
+		
+		updateCommentsStatus();
+		
+		if(mCommentsAdapter!=null)
+		{
+			mCommentsAdapter.notifyDataSetChanged();
+		}
+		else
+			Log.i("Disc","mCommentsAdapter NULL");
+	}
+	
 	private static AdapterContextMenuInfo castAdapterContextMenuInfo(final ContextMenuInfo contextMenuInfo) {
 
 		try {
@@ -500,13 +639,16 @@ public class PointCommentsTabFragment extends SherlockFragment implements OnClic
 				Log.d(TAG, "[onLoadFinished] cursor count: " + data.getCount() + ", id: " + loader.getId());
 			}
 			
+			/*
 			for(String name:data.getColumnNames()){
 				Log.i("Disc * column Name",String.valueOf(name));
 			}
+			//*/
 			
 			switch (loader.getId()) {
 				case COMMENTS_ID:
 					mCommentsAdapter.swapCursor(data);
+					updateCommentsStatus();
 					break;
 				case POINT_NAME_ID:
 					if (data.moveToFirst()) {

@@ -14,6 +14,7 @@ import android.database.sqlite.SQLiteException;
 import android.net.Uri;
 import android.os.ParcelFileDescriptor;
 import android.provider.BaseColumns;
+import android.text.TextUtils;
 import android.util.Log;
 
 import java.util.ArrayList;
@@ -42,7 +43,8 @@ public class DiscussionsProvider extends ContentProvider {
 	private static final int ATTACHMENT_ITEM = 1102;
 	
 	private static final int COMMENTS_DIR = 500;
-	private static final int COMMENTS_ITEM = 501;
+	//private static final int COMMENTS_DIR_NOTIFIER = 501;
+	private static final int COMMENTS_ITEM = 502;
 	
 	private static final int COMMENTS_PERSON_ENTRY_DIR=1300;
 	private static final int COMMENTS_PERSON_ENTRY_ITEM=1301;
@@ -78,10 +80,17 @@ public class DiscussionsProvider extends ContentProvider {
 	private static final int TOPICS_ITEM_POINTS_DIR = 402;
 	private DiscussionsDatabase mOpenHelper;
 
+	
+	
+	
+	
+	
 	/** Build a simple {@link SelectionBuilder} to match the requested {@link Uri}. This is usually enough to
 	 * support {@link #insert}, {@link #update}, and {@link #delete} operations. */
 	private static SelectionBuilder buildSimpleSelection(final Uri uri) {
 
+		//Log.i("Disc matcher uri",uri.toString());
+		
 		final SelectionBuilder builder = new SelectionBuilder();
 		final int match = sUriMatcher.match(uri);
 		switch (match) {
@@ -124,6 +133,8 @@ public class DiscussionsProvider extends ContentProvider {
 			}
 			case COMMENTS_DIR:
 				return builder.table(Comments.TABLE_NAME);
+			//case COMMENTS_DIR_NOTIFIER:
+			//	return builder.table(Comments.TABLE_NAME);
 			case COMMENTS_ITEM: {
 				final String valueId = Comments.getValueId(uri);
 				return builder.table(Comments.TABLE_NAME).where(Comments.Columns.ID + "=?", valueId);
@@ -133,7 +144,7 @@ public class DiscussionsProvider extends ContentProvider {
 				return builder.table(CommentsPersonReadEntry.TABLE_NAME);
 			case COMMENTS_PERSON_ENTRY_ITEM:{
 				final String valueId=CommentsPersonReadEntry.getValueId(uri);
-				return builder.table(CommentsPersonReadEntry.TABLE_NAME).where(Comments.Columns.ID+"=?", valueId);
+				return builder.table(CommentsPersonReadEntry.TABLE_NAME).where(CommentsPersonReadEntry.Columns.ID+"=?", valueId);
 			}
 			
 			
@@ -175,6 +186,7 @@ public class DiscussionsProvider extends ContentProvider {
 		matcher.addURI(authority, Points.A_TABLE_PREFIX, POINTS_DIR);
 		matcher.addURI(authority, Points.A_TABLE_PREFIX + "/*", POINTS_ITEM);
 		matcher.addURI(authority, Points.A_TABLE_PREFIX + "," + Persons.A_TABLE_PREFIX, POINTS_PERSONS_DIR);
+		
 		// person
 		matcher.addURI(authority, Persons.A_TABLE_PREFIX, PERSONS_DIR);
 		matcher.addURI(authority, Persons.A_TABLE_PREFIX + "/*", PERSONS_ITEM);
@@ -193,11 +205,13 @@ public class DiscussionsProvider extends ContentProvider {
 				TOPICS_ITEM_PERSONS_DIR);
 		// comment
 		matcher.addURI(authority, Comments.A_TABLE_PREFIX, COMMENTS_DIR);
+		//matcher.addURI(authority, Comments.A_TABLE_PREFIX, COMMENTS_DIR_NOTIFIER);
 		matcher.addURI(authority, Comments.A_TABLE_PREFIX + "/*", COMMENTS_ITEM);
 		
 		// CommentPersonEntry
 		matcher.addURI(authority, CommentsPersonReadEntry.A_TABLE_PREFIX, COMMENTS_PERSON_ENTRY_DIR);
 		matcher.addURI(authority, CommentsPersonReadEntry.A_TABLE_PREFIX+"/*",COMMENTS_PERSON_ENTRY_ITEM);
+		
 		
 		// description
 		matcher.addURI(authority, Descriptions.A_TABLE_PREFIX, DESCRIPTION_DIR);
@@ -215,6 +229,8 @@ public class DiscussionsProvider extends ContentProvider {
 		// sources
 		matcher.addURI(authority, Sources.A_TABLE_PREFIX, SOURCES_DIR);
 		matcher.addURI(authority, Sources.A_TABLE_PREFIX + "/*", SOURCES_ITEM);
+		
+		
 		return matcher;
 	}
 
@@ -289,6 +305,8 @@ public class DiscussionsProvider extends ContentProvider {
 				return Persons.CONTENT_DIR_TYPE;
 			case COMMENTS_DIR:
 				return Comments.CONTENT_DIR_TYPE;
+			//case COMMENTS_DIR_NOTIFIER:
+			//	return Comments.CONTENT_DIR_TYPE;
 			case COMMENTS_ITEM:
 				return Comments.CONTENT_ITEM_TYPE;
 			
@@ -362,6 +380,11 @@ public class DiscussionsProvider extends ContentProvider {
 					insertedId = db.insertOrThrow(Comments.TABLE_NAME, null, values);
 					insertedUri = Comments.buildTableUri(insertedId);
 					break;
+				
+				//case COMMENTS_DIR_NOTIFIER:
+					//insertedId = db.insertOrThrow(Comments.TABLE_NAME, null, values);
+					//insertedUri = Comments.buildTableUri(insertedId);
+					//break;
 					
 				case COMMENTS_PERSON_ENTRY_DIR:
 					insertedId=db.insertOrThrow(CommentsPersonReadEntry.TABLE_NAME, null, values);
@@ -452,6 +475,18 @@ public class DiscussionsProvider extends ContentProvider {
 				Log.i("Disc DiscussionsProvider","POINTS_PERSONS_DIR");
 				
 				
+				//Log.i("*****************","*****************************");
+				/*
+				for(String sel:selectionArgs){
+					Log.i("Disc Points Person selectionArgs",sel);
+				}
+				Log.i("Disc Points Person selection",String.valueOf(selection));
+				Log.i("Disc Points Person Points",String.valueOf(builder.getSelection()));
+				Log.i("Disc sortOrder",String.valueOf(sortOrder));
+				//*/
+				//Log.i("Disc SQL WHERE ",getWhere(selection, selectionArgs));
+				
+				//*
 				builder.table(Points.TABLE_NAME + "," + Persons.TABLE_NAME);
 				builder.mapToTable(BaseColumns._ID, Points.TABLE_NAME).mapToTable(Points.Columns.ID,
 						Points.TABLE_NAME);
@@ -460,15 +495,109 @@ public class DiscussionsProvider extends ContentProvider {
 				Cursor c = builder.query(db, new String[] { 
 						BaseColumns._ID, 
 						Points.Columns.ID,
-						Points.Columns.NAME, 
+						Points.Columns.NAME,
+						Points.Columns.PERSON_ID,
+						Points.Columns.TOPIC_ID,
 						Persons.Columns.COLOR, 
-						Points.Columns.ORDER_NUMBER,
-						Points.Columns.ISNEW }, 
+						Points.Columns.ORDER_NUMBER}, 
 						Points.Qualified.POINT_ID, null, sortOrder, null);
 				notificationUri = Points.CONTENT_URI;
 				c.setNotificationUri(getContext().getContentResolver(), notificationUri);
 				
+				//*/
 				
+				
+				//*
+				/*
+				//SQL1+ topic var+ SQL2+ person id var+SQL3;
+				String sql1="SELECT  "+Points.TABLE_NAME+"."+BaseColumns._ID+", "+Points.TABLE_NAME+"."+Points.Columns.ID+", "+Points.Columns.NAME
+						+", "+Persons.Columns.COLOR+", "+Points.Columns.ORDER_NUMBER+", "+Points.Columns.ISNEW
+						+", ( CASE WHEN EXISTS( "
+						//condition selection 
+						+" SELECT *, (  CASE WHEN EXISTS( "
+						+" SELECT * FROM "+CommentsPersonReadEntry.TABLE_NAME
+						+" WHERE "+CommentsPersonReadEntry.Columns.COMMENT_ID+"= "+Comments.TABLE_NAME+"."+Comments.Columns.ID
+						+" AND "+CommentsPersonReadEntry.TABLE_NAME+"."+CommentsPersonReadEntry.Columns.PERSON_ID+"="+Points.Columns.PERSON_ID
+						+" )=1 THEN 0 ELSE 1 END ) AS "+Comments.Columns.IsReadedFlag
+						+" FROM "+Comments.TABLE_NAME
+						+" WHERE "+Comments.Columns.POINT_ID+"="+Points.TABLE_NAME+"."+Points.Columns.ID+" AND "+Comments.Columns.IsReadedFlag+"=1"
+						+" )=1 THEN 1 ELSE 0 END ) AS "+Points.Columns.IsReadedPointFlag
+						+" FROM "+Points.TABLE_NAME+", "+Persons.TABLE_NAME
+						+" WHERE ";
+				//*/
+				/*
+				String sql1="SELECT  "+Points.TABLE_NAME+"."+BaseColumns._ID+", "+Points.TABLE_NAME+"."+Points.Columns.ID+", "+Points.Columns.NAME
+						+", "+Persons.Columns.COLOR+", "+Points.Columns.ORDER_NUMBER+", "+Points.Columns.ISNEW
+						+", ( CASE WHEN EXISTS ( "
+						+" SELECT *, ( "
+						+" SELECT "+CommentsPersonReadEntry.Columns.COMMENT_ID
+						+" FROM "+CommentsPersonReadEntry.TABLE_NAME
+						+" WHERE "+CommentsPersonReadEntry.TABLE_NAME+"."+CommentsPersonReadEntry.Columns.COMMENT_ID+"="+Comments.Columns.ID
+						+" AND "+CommentsPersonReadEntry.TABLE_NAME+"."+CommentsPersonReadEntry.Columns.PERSON_ID+"="+Points.Columns.PERSON_ID
+						+" ) AS "+Comments.Columns.IsReadedFlag
+						+" FROM "+Comments.TABLE_NAME
+						+" WHERE "+Comments.Columns.POINT_ID+"="+Points.TABLE_NAME+"."+Points.Columns.ID+" AND 0<"+Comments.Columns.IsReadedFlag
+						+" )=1 THEN 1 ELSE 0 END "
+						+" ) AS "+Points.Columns.IsReadedPointFlag
+						+" FROM "+Points.TABLE_NAME+", "+Persons.TABLE_NAME
+						+" WHERE ";
+				//*/
+				
+				/*
+				String sql1="SELECT ArgPoint._id, ArgPoint.Id, ArgPoint.Point, ArgPoint.ordernumber, person.color, " 
+				+"( SELECT ( SELECT ("
+				+" CASE WHEN EXISTS ( SELECT id"
+				+" FROM commentpersonreadentry"
+				+" WHERE commentpersonreadentry.Comment_Id=comment.Id "
+				+" AND commentpersonreadentry.Person_Id=comment.Person "
+				+" )=1 THEN 0 ELSE 1 END ) "
+				+" FROM Comment "
+				+" WHERE comment.point=argpoint.id AND comment.person!=Person.Id ) FROM person "
+				+" )AS "+Points.Columns.IsReadedPointFlag//CommentReadedFlag"
+				+" FROM argpoint, person"
+				+" WHERE ";
+				//*/
+				/*
+				String where=getWhere(selection, selectionArgs);
+				
+				String sql1="SELECT ArgPoint._id, ArgPoint.Id, ArgPoint.Point, ArgPoint.ordernumber, person.color,"
+						+" ( "
+						+" SELECT commentpersonreadentry.id "
+						+" FROM comment,commentpersonreadentry"
+						+" WHERE comment.point=argpoint.id "
+						+" AND comment.id=commentpersonreadentry.Comment_Id   "
+						+" AND commentpersonreadentry.Person_Id";
+				
+				if(where.contains(Points.Columns.PERSON_ID+ "!=? AND "))
+				{
+					sql1+="!="+selectionArgs[1];
+				}
+				else
+				{
+					sql1+="="+selectionArgs[1];
+				}
+				
+				sql1+=" GROUP BY comment.id "
+						+" ) "+Points.Columns.IsReadedPointFlag
+						+" FROM argpoint, person"
+						+" WHERE ";
+				
+				
+				String sql3=" GROUP BY "+Points.TABLE_NAME+"."+Points.Columns.ID;
+				
+				String sql4="";
+				if(sortOrder!=null && sortOrder.length()>0)
+					sql4+=" ORDER BY "+sortOrder;
+				
+				
+				String sql=sql1+where+sql3+sql4;
+				
+				//Log.i("Disc POIN SQL",sql);
+				Cursor c=db.rawQuery(sql, null);
+				//*/
+				notificationUri = Points.CONTENT_URI;
+				c.setNotificationUri(getContext().getContentResolver(), notificationUri);
+				//*/
 				
 				return c;
 			}
@@ -500,6 +629,7 @@ public class DiscussionsProvider extends ContentProvider {
 				Cursor c = builder.query(db, new String[] { BaseColumns._ID, Discussions.Columns.ID,
 						Discussions.Columns.SUBJECT }, Discussions.Qualified.DISCUSSION_ID, null, sortOrder,
 						null);
+				
 				c.setNotificationUri(getContext().getContentResolver(), notificationUri);
 				return c;
 			}
@@ -529,26 +659,26 @@ public class DiscussionsProvider extends ContentProvider {
 			}
 			case COMMENTS_DIR: {
 				Log.i("Disc DiscussionsProvider","COMMENTS_DIR");
-				//*
+				
+				/*
 				for(String str:selectionArgs){
 					Log.i("Disc","selectionArgs:"+str);
 				}
 				//*/
-				
-				String[] selectionArgs2={selectionArgs[0]};
-				String loggedPerson=selectionArgs[1];
-				
-				/*
+				//*
 				builder.table(Comments.TABLE_NAME + "," + Persons.TABLE_NAME);
 				builder.mapToTable(BaseColumns._ID, Comments.TABLE_NAME).mapToTable(Comments.Columns.ID,
 						Comments.TABLE_NAME);
 				if (selectionArgs != null) {
+					
+					String[] selectionArgs2={selectionArgs[0]};
+					String loggedPerson=selectionArgs[1];
+					
 					builder.where(Comments.Columns.POINT_ID + "=? AND " + Comments.Columns.PERSON_ID + "="
 							+ Persons.Qualified.PERSON_ID, selectionArgs2);
 				} else {
 					builder.where(selection, (String[]) null);
-				}				
-				
+				}
 				Cursor  c = builder.query(db, new String[] { 
 						BaseColumns._ID, 
 						Comments.Columns.ID,
@@ -556,39 +686,16 @@ public class DiscussionsProvider extends ContentProvider {
 						Persons.Columns.NAME, 
 						Persons.Columns.COLOR,
 						Comments.Columns.PERSON_ID, 
-						Comments.Columns.POINT_ID, 
-						"(CASE WHEN EXISTS( SELECT * FROM "+CommentsPersonReadEntry.TABLE_NAME
-						+" WHERE "+CommentsPersonReadEntry.Columns.COMMENT_ID+"="+Comments.Columns.ID+" AND "
-						+CommentsPersonReadEntry.Columns.PERSON_ID+"="+loggedPerson+" )=1 THEN 0 ELSE 1 END ) "
-						+" AS "+Comments.Columns.ISNEW
+						Comments.Columns.POINT_ID
 						}
 						,Comments.Qualified.COMMENT_ID, null, sortOrder, null);
-				//*/
-				String sql="SELECT Comment._Id, Comment.Id, Text, Name, Color, Person, Point,IsNew,"
-						+" (CASE WHEN EXISTS( SELECT * FROM "+CommentsPersonReadEntry.TABLE_NAME
-						+" WHERE "+CommentsPersonReadEntry.Columns.COMMENT_ID+"="+Comments.Columns.ID+" AND "
-						+CommentsPersonReadEntry.Columns.PERSON_ID+"="+loggedPerson+" )=1 THEN 0 ELSE 1 END ) "
-						+" AS 'Flag'"//+Comments.Columns.ISNEW
-						+" FROM "+Comments.TABLE_NAME+","+Persons.TABLE_NAME
-						+" WHERE "+Comments.Columns.POINT_ID+"=?"
-						+" AND Person=Person.Id";
-					
-				//the right SQL selection script
-				String sql2="SELECT Comment._Id, Comment.Id, Text, Name, Color, Person, Point,"
-							+" (CASE WHEN EXISTS( SELECT * FROM  CommentPersonReadEntry"
-							+" WHERE CommentPersonReadEntry.Comment_Id=Comment.Id  AND  CommentPersonReadEntry.Person_Id=3 )=1 THEN 0 ELSE 1 END ) " 
-							+" AS "+Comments.Columns.IsReadedFlag 
-							+" FROM  Comment,Person "
-							+" WHERE "
-							+" Point=? AND Person=Person.Id"; 
-		
-				Log.i("Disc Comment SQL",sql2);
-						
-				Cursor c=db.rawQuery(sql2, selectionArgs2);
-				
+			
+							
+	
 				notificationUri = Comments.CONTENT_URI;
 				c.setNotificationUri(getContext().getContentResolver(), notificationUri);
 				Log.i("Disc","COMMENT:"+builder.getSelection());								
+				
 				
 				return c;
 			}
@@ -647,6 +754,7 @@ public class DiscussionsProvider extends ContentProvider {
 				builder = buildSimpleSelection(uri);
 				builder.where(selection, selectionArgs);
 		}
+		
 		Cursor c = builder.query(db, projection, sortOrder);
 		c.setNotificationUri(getContext().getContentResolver(), notificationUri);
 		return c;
@@ -666,5 +774,30 @@ public class DiscussionsProvider extends ContentProvider {
 		return rowCount;
 	}
 	
+	
+	protected String getWhere(String selection, String[] selectionArgs){
+	
+		StringBuilder strBuilder=new StringBuilder();
+		
+		if (TextUtils.isEmpty(selection)) {
+			if ((selectionArgs != null) && (selectionArgs.length > 0)) {
+				throw new IllegalArgumentException("Valid selection required when including arguments=");
+			}
+
+		}
+
+		strBuilder.append("(").append(selection).append(")");
+		
+		String where=strBuilder.toString();
+		
+		/*
+		for(String arg:selectionArgs){
+			int index=where.indexOf("?");
+			where=where.substring(0,index)+arg+" "+where.substring(index+1);
+		}
+		//*/
+		
+		return where;
+	}
 	
 }

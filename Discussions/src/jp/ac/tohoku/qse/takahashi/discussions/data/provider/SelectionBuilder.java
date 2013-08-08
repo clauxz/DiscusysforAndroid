@@ -128,6 +128,7 @@ public class SelectionBuilder {
 		if (LOGV) {
 			Log.v(TAG, "query(columns=" + Arrays.toString(columns) + ") " + this);
 		}
+		
 		return db.query(mTable, columns, getSelection(), getSelectionArgs(), groupBy, having, orderBy, limit);
 	}
 

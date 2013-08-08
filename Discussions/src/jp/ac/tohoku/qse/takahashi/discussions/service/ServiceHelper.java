@@ -1,9 +1,12 @@
 package jp.ac.tohoku.qse.takahashi.discussions.service;
 
+import java.util.ArrayList;
+
 import jp.ac.tohoku.qse.takahashi.discussions.ApplicationConstants;
 import jp.ac.tohoku.qse.takahashi.discussions.data.model.Attachment;
 import jp.ac.tohoku.qse.takahashi.discussions.data.model.SelectedPoint;
 import jp.ac.tohoku.qse.takahashi.discussions.data.model.Source;
+import jp.ac.tohoku.qse.takahashi.discussions.data.provider.DiscussionsContract.CommentsPersonReadEntry;
 import jp.ac.tohoku.qse.takahashi.discussions.data.provider.DiscussionsContract.Points;
 import jp.ac.tohoku.qse.takahashi.discussions.photon.PhotonController;
 import jp.ac.tohoku.qse.takahashi.discussions.ui.IntentAction;
@@ -169,6 +172,19 @@ public class ServiceHelper {
 		mContext.startService(intent);
 	}
 	
+	//*
+	public void insertCommentPersonReadedEntities(final Bundle commentValues,final SelectedPoint selectedPoint,final int[] commentsIDs){
+		
+		Intent intent=new Intent(IntentAction.UPLOAD);
+		intent.putExtra(ServiceExtraKeys.TYPE_ID, UploadService.TYPE_INSERT_COMMENTPERSONREADEDENTRY_ARRAY);
+		intent.putExtra(ServiceExtraKeys.VALUE, commentValues);
+		intent.putExtra(ServiceExtraKeys.VALUE_INTEGER_ARRAY, commentsIDs);
+		intent.putExtra(ServiceExtraKeys.SELECTED_POINT, selectedPoint);
+		intent.putExtra(ServiceExtraKeys.ACTIVITY_RECEIVER, mActivityReceiver);
+		intent.putExtra(ServiceExtraKeys.PHOTON_RECEIVER, mPhotonController.getResultReceiver());
+		mContext.startService(intent);
+	}
+	//*/
 	/**
 	 * Function used only for fixing WPF client bug. In future such function need to delete when 
 	 * WPF client will be fixed (wpf client will change algorithm for comment adding and placeholder functionality).

@@ -1,8 +1,12 @@
 package jp.ac.tohoku.qse.takahashi.discussions.ui.fragments;
 
+import java.util.ArrayList;
+
 import jp.ac.tohoku.qse.takahashi.discussions.ApplicationConstants;
 import jp.ac.tohoku.qse.takahashi.discussions.data.provider.DiscussionsContract.Points;
 import jp.ac.tohoku.qse.takahashi.discussions.ui.ExtraKey;
+import jp.ac.tohoku.qse.takahashi.discussions.ui.activities.PointDetailsActivity;
+import jp.ac.tohoku.qse.takahashi.discussions.utils.NotificationPoint;
 
 import jp.ac.tohoku.qse.takahashi.discussions.R;
 
@@ -33,22 +37,30 @@ public class UserPointListFragment extends SherlockListFragment {
 	private int mPersonId;
 	private int mTopicId;
 
+	private NotificationPoint notificationPoint;
+	
 	@Override
 	public void onActivityCreated(final Bundle savedInstanceState) {
 
 		super.onActivityCreated(savedInstanceState);
 		initFromIntentExtra();
 		
+		//updateCommentsStatus();
+		
 		// Create an empty adapter we will use to display the loaded data.
 		mUserPointsAdapter = new SimpleCursorAdapter(getActivity(), R.layout.list_item_point, null,
-				new String[] { Points.Columns.NAME, Points.Columns.ID, Points.Columns.ORDER_NUMBER,Points.Columns.ISNEW },
+				new String[] { Points.Columns.NAME, Points.Columns.ID, Points.Columns.ORDER_NUMBER,Points.Columns.ID },
 				new int[] { R.id.list_item_text, R.id.image_person_color, R.id.text_order_num, R.id.image_item_new }
 		, 0);
+		
+		
 		mUserPointsAdapter.setViewBinder(new ViewBinder() {
 
 			@Override
 			public boolean setViewValue(final View view, final Cursor cursor, final int columnIndex) {
 
+
+				
 				int viewId = view.getId();
 				switch (viewId) {
 					case R.id.image_person_color:
@@ -66,11 +78,20 @@ public class UserPointListFragment extends SherlockListFragment {
 						return true;
 					case R.id.image_item_new:
 						{
-							/*
-							int index=cursor.getColumnIndex(Points.Columns.ISNEW);
-							int isNew=cursor.getInt(index);
+							//*
+							int index=cursor.getColumnIndexOrThrow(Points.Columns.ID);
+							int pointId=cursor.getInt(index);
 							
-							if(ApplicationConstants.OBJECT_NEW==isNew){
+							if(notificationPoint.IsPointContainNewComments(pointId)){
+								((ImageView)view).setImageBitmap(
+										BitmapFactory.decodeResource(getResources(), R.drawable.ic_data_changed));
+							}
+							else
+							{
+								((ImageView)view).setImageBitmap(null);
+							}
+							/*
+							if(isNew>0){
 								((ImageView)view).setImageBitmap(
 										BitmapFactory.decodeResource(getResources(), R.drawable.ic_data_changed));
 							}
@@ -91,6 +112,8 @@ public class UserPointListFragment extends SherlockListFragment {
 		getLoaderManager().initLoader(UserPointsCursorLoader.LOADER_USER_POINTS_ID, null,
 				new UserPointsCursorLoader());
 	}
+	
+	
 
 	@Override
 	public void onListItemClick(final ListView l, final View v, final int position, final long id) {
@@ -140,6 +163,56 @@ public class UserPointListFragment extends SherlockListFragment {
 		return intent;
 	}
 
+	protected void updateCommentsStatus(){
+		notificationPoint=new NotificationPoint(getActivity(),mPersonId,mTopicId,NotificationPoint.MODE_ALL_USERS);
+		/*
+		if(getActivity() instanceof PointDetailsActivity){
+			boolean com=false;
+			
+			ArrayList<Integer> ids=new ArrayList<Integer>();
+			
+			if(mUserPointsAdapter!=null)
+			{
+				Cursor cursor=mUserPointsAdapter.getCursor();
+				cursor.moveToFirst();
+				
+				if(cursor!= null && 0<cursor.getCount()){
+					
+					do
+					{
+						int index=cursor.getColumnIndex(Points.Columns.ID);
+						int indexTopic=cursor.getColumnIndexOrThrow(Points.Columns.TOPIC_ID);
+						int id=cursor.getInt(index);
+						int topic=cursor.getInt(indexTopic);
+						
+						if(topic==mTopicId && id!=Integer.MIN_VALUE)
+							{
+								if(notificationPoint.IsPointContainNewComments(id))
+								{
+									com=true;
+									((PointDetailsActivity)getActivity()).setNewComments(com);
+									((PointDetailsActivity)getActivity()).updateCommentIcon();
+									
+									Log.i("--------------","1111111111111111111111111111111");
+									
+									
+									return;
+								}
+							}
+					}while(cursor.moveToNext());
+					
+					
+				}
+			}
+			
+			Log.i("--------------","0000000000000000000000");
+			
+			((PointDetailsActivity)getActivity()).setNewComments(com);
+			((PointDetailsActivity)getActivity()).updateCommentIcon();
+		}
+		//*/
+	}
+	
 	private class UserPointsCursorLoader implements LoaderManager.LoaderCallbacks<Cursor> {
 
 		private static final int LOADER_USER_POINTS_ID = 0x05;
@@ -152,7 +225,10 @@ public class UserPointListFragment extends SherlockListFragment {
 					String where = Points.Columns.TOPIC_ID + "=? AND " + Points.Columns.PERSON_ID + "=? ";
 					String[] args = { String.valueOf(mTopicId), String.valueOf(mPersonId) };
 					String sortOrder = Points.Columns.ORDER_NUMBER + " ASC";
-					return new CursorLoader(getActivity(), Points.CONTENT_URI, null, where, args, sortOrder);
+					//original 
+					//return new CursorLoader(getActivity(), Points.CONTENT_URI , null, where, args, sortOrder);
+					//changed points url
+					return new CursorLoader(getActivity(),Points.CONTENT_AND_PERSON_URI, null, where, args, sortOrder);
 				}
 				default:
 					throw new IllegalArgumentException("Unknown loader id: " + id);
@@ -177,6 +253,7 @@ public class UserPointListFragment extends SherlockListFragment {
 			switch (loader.getId()) {
 				case LOADER_USER_POINTS_ID:
 					mUserPointsAdapter.swapCursor(data);
+					updateCommentsStatus();
 					break;
 				default:
 					throw new IllegalArgumentException("Unknown loader id: " + loader.getId());

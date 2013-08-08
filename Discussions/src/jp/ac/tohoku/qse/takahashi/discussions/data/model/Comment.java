@@ -72,6 +72,29 @@ public class Comment implements Value {
 			throw new IllegalArgumentException("Cursor was without value");
 		}
 	}
+	
+	public Comment(final boolean fromRow,Cursor cursor){
+		if(fromRow==true){
+			int size=cursor.getColumnCount();
+			
+			int idIndex = cursor.getColumnIndexOrThrow(Comments.Columns.ID);
+			int textIndex = cursor.getColumnIndexOrThrow(Comments.Columns.TEXT);
+			int personIdIndex = cursor.getColumnIndexOrThrow(Comments.Columns.PERSON_ID);
+			int pointIdIndex = cursor.getColumnIndexOrThrow(Comments.Columns.POINT_ID);
+			
+			
+			personId = cursor.getInt(personIdIndex);
+			id = cursor.getInt(idIndex);
+			text = cursor.getString(textIndex);
+			pointId = cursor.getInt(pointIdIndex);
+		}
+		else{
+			id = Integer.MIN_VALUE;
+			text = "";
+			personId = Integer.MIN_VALUE;
+			pointId = Integer.MIN_VALUE;
+		}	
+	}
 
 	public int getId() {
 

@@ -8,6 +8,7 @@ public class ServiceExtraKeys {
 	public static final String TYPE_ID = "intent.extra.key.EXTRA_TYPE_ID";
 	public static final String URI = "intent.extra.key.EXTRA_URI";
 	public static final String VALUE = "intent.extra.key.EXTRA_VALUE";
+	public static final String VALUE_INTEGER_ARRAY = "intent.extra.key.EXTRA_VALUE_INTEGER_ARRAY";
 	public static final String VALUE_ID = "intent.extra.key.EXTRA_VALUE_ID";
 
 	/** A private Constructor prevents class from instantiating. */

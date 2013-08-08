@@ -92,6 +92,73 @@ public class Point implements Value {
 		sideCode = cursor.getInt(sideCodeIndex);
 		topicId = cursor.getInt(topicIdIndex);
 	}
+	
+	public Point(final boolean fromRow,final Cursor cursor)
+	{
+		if(fromRow==true)
+		{
+			//int changesPendingIndex = cursor.getColumnIndexOrThrow(Points.Columns.CHANGES_PENDING);
+			int orderNumIndex = cursor.getColumnIndexOrThrow(Points.Columns.ORDER_NUMBER);
+			int idIndex = cursor.getColumnIndexOrThrow(Points.Columns.ID);
+			int nameIndex = cursor.getColumnIndexOrThrow(Points.Columns.NAME);
+			int personIdIndex = cursor.getColumnIndexOrThrow(Points.Columns.PERSON_ID);
+			//int recentlyEnteredMediaUrlIndex = cursor
+			//		.getColumnIndexOrThrow(Points.Columns.RECENTLY_ENTERED_MEDIA_URL);
+			//int recentlyEnteredSourceIndex = cursor.getColumnIndexOrThrow(Points.Columns.RECENTLY_ENTERED_SOURCE);
+			//int sharedToPublicIndex = cursor.getColumnIndexOrThrow(Points.Columns.SHARED_TO_PUBLIC);
+			//int sideCodeIndex = cursor.getColumnIndexOrThrow(Points.Columns.SIDE_CODE);
+			int topicIdIndex = cursor.getColumnIndexOrThrow(Points.Columns.TOPIC_ID);
+			
+			changesPending = false;
+			/*
+			if (cursor.getInt(changesPendingIndex) == 0) {
+				changesPending = false;
+			} else if (cursor.getInt(changesPendingIndex) == 1) {
+				changesPending = true;
+			} else {
+				throw new IllegalStateException("Point cursor has unknown changes pending value: "
+						+ cursor.getInt(changesPendingIndex));
+			}
+			//*/
+			orderNumber = cursor.getInt(orderNumIndex);
+			id = cursor.getInt(idIndex);
+			name = cursor.getString(nameIndex);
+			personId = cursor.getInt(personIdIndex);
+			
+			recentlyEnteredMediaUrl = "Paste link to media and return";
+			recentlyEnteredSource = "Your source here";
+			//recentlyEnteredMediaUrl = cursor.getString(recentlyEnteredMediaUrlIndex);
+			//recentlyEnteredSource = cursor.getString(recentlyEnteredSourceIndex);
+			sharedToPublic = true;
+			sideCode = 0;
+			/*
+			if (cursor.getInt(sharedToPublicIndex) == 0) {
+				sharedToPublic = false;
+			} else if (cursor.getInt(sharedToPublicIndex) == 1) {
+				sharedToPublic = true;
+			} else {
+				throw new IllegalStateException("Point has unknown shared to public: "
+						+ cursor.getInt(sharedToPublicIndex));
+			}
+			sideCode = cursor.getInt(sideCodeIndex);
+			//*/
+			topicId = cursor.getInt(topicIdIndex);
+		}
+		else
+		{
+			changesPending = false;
+			id = Integer.MIN_VALUE;
+			name = "Your point here";
+			orderNumber = Integer.MIN_VALUE;
+			personId = Integer.MIN_VALUE;
+			recentlyEnteredMediaUrl = "Paste link to media and return";
+			recentlyEnteredSource = "Your source here";
+			sharedToPublic = true;
+			sideCode = 0;
+			topicId = Integer.MIN_VALUE;
+		}
+	}
+	
 
 	public int getId() {
 

@@ -5,6 +5,7 @@ import jp.ac.tohoku.qse.takahashi.discussions.data.provider.DiscussionsContract.
 import android.content.ContentValues;
 import android.database.Cursor;
 import android.os.Bundle;
+import android.util.Log;
 
 public class CommentPersonReadEntry implements Value{
 
@@ -41,6 +42,30 @@ public class CommentPersonReadEntry implements Value{
 		} else {
 			throw new IllegalArgumentException("Cursor was without value");
 		}
+	}
+	
+	public CommentPersonReadEntry(final boolean fromRow,final Cursor cursor) {
+
+		super();
+		if(fromRow==true) 
+		{
+			
+			int idIndex = cursor.getColumnIndexOrThrow(CommentsPersonReadEntry.Columns.ID);
+			int personIdIndex = cursor.getColumnIndexOrThrow(CommentsPersonReadEntry.Columns.PERSON_ID);
+			int commentIdIndex  = cursor.getColumnIndexOrThrow(CommentsPersonReadEntry.Columns.COMMENT_ID);
+			id = cursor.getInt(idIndex);
+			personId = cursor.getInt(personIdIndex);
+			commentId = cursor.getInt(commentIdIndex);
+		}
+		else
+		{
+			id=Integer.MIN_VALUE;
+			personId=Integer.MIN_VALUE;
+			commentId=Integer.MIN_VALUE;
+		}
+		
+		//Log.i("Disc CommentReadedEntry","id:"+String.valueOf(id)+" commentId:"+String.valueOf(commentId)+
+		//		" personId:"+String.valueOf(personId));
 	}
 	
 	public int getId() {

@@ -28,7 +28,10 @@ import com.actionbarsherlock.view.MenuItem;
 import java.util.ArrayList;
 
 import jp.ac.tohoku.qse.takahashi.discussions.data.PreferenceHelper;
+import jp.ac.tohoku.qse.takahashi.discussions.data.model.ArgPointChanged;
 import jp.ac.tohoku.qse.takahashi.discussions.data.provider.DiscussionsContract.Topics;
+import jp.ac.tohoku.qse.takahashi.discussions.photon.DiscussionUser;
+import jp.ac.tohoku.qse.takahashi.discussions.photon.PhotonServiceCallback;
 import jp.ac.tohoku.qse.takahashi.discussions.ui.ExtraKey;
 import jp.ac.tohoku.qse.takahashi.discussions.ui.IntentAction;
 import jp.ac.tohoku.qse.takahashi.discussions.ui.fragments.PointCommentsTabFragment;
@@ -38,7 +41,8 @@ import jp.ac.tohoku.qse.takahashi.discussions.ui.fragments.PointSourcesTabFragme
 import jp.ac.tohoku.qse.takahashi.discussions.utils.MyLog;
 import jp.ac.tohoku.qse.takahashi.discussions.utils.fragmentasynctask.SyncStatusUpdaterFragment;
 
-public class PointDetailsActivity extends BaseActivity {
+public class PointDetailsActivity extends BaseActivity
+{
 
 	private static final String TAG = PointDetailsActivity.class.getSimpleName();
 	private static final int COMMENT_TAB_POSITION = 1;
@@ -53,6 +57,10 @@ public class PointDetailsActivity extends BaseActivity {
 	private String personName;
 	private SyncStatusUpdaterFragment mSyncStatusUpdaterFragment;
 
+	private Tab commentsTab=null;
+	private  boolean newComments=false;
+	
+	
 	@Override
 	public void onConfigurationChanged(final Configuration newConfig) {
 
@@ -153,6 +161,7 @@ public class PointDetailsActivity extends BaseActivity {
 	protected void onCreate(final Bundle savedInstanceState) {
 
 		super.onCreate(savedInstanceState);
+		newComments=false;
 		setContentView(R.layout.activity_point_details);
 		initFromIntentExtra(getIntent());
 		mViewPager = (ViewPager) findViewById(R.id.pager);
@@ -199,12 +208,38 @@ public class PointDetailsActivity extends BaseActivity {
 
 	private void addCommentsTab() {
 
-		Tab commentsTab = getSupportActionBar().newTab();
+		commentsTab = getSupportActionBar().newTab();
 		// commentsTab.setText(R.string.tab_title_comments);
 		Bundle commentArguments = PointCommentsTabFragment.intentToFragmentArguments(getIntent());
-		commentsTab.setIcon(R.drawable.ic_tab_comments);
+		
+	    updateCommentIcon();
+		
 		mTabsAdapter.addTab(commentsTab, FragmentTag.POINT_COMMENTS, PointCommentsTabFragment.class,
 				commentArguments);
+	}
+
+	public boolean isNewComments() {
+		return newComments;
+	}
+
+	public void setNewComments(boolean com) {
+		newComments = com;
+		updateCommentIcon();
+	}
+	
+	public void updateCommentIcon(){
+		if(commentsTab!=null)
+		{
+			if(newComments==true)
+			{
+				commentsTab.setIcon(R.drawable.ic_tab_comments_new);
+			}
+			else
+			{
+				commentsTab.setIcon(R.drawable.ic_tab_comments);
+			}
+				
+		}
 	}
 
 	private void addDescripitionFragmentOnly() {
@@ -348,6 +383,8 @@ public class PointDetailsActivity extends BaseActivity {
 
 		return mSyncStatusUpdaterFragment.getReceiver();
 	}
+	
+	
 
 	/** This is a helper class that implements the management of tabs and all details of connecting a ViewPager
 	 * with associated TabHost. It relies on a trick. Normally a tab host has a simple API for supplying a
@@ -447,6 +484,7 @@ public class PointDetailsActivity extends BaseActivity {
 		}
 	}
 
+	
 	private final class FragmentTag {
 
 		private static final String POINT_COMMENTS = "point_comments_tag";
@@ -454,4 +492,56 @@ public class PointDetailsActivity extends BaseActivity {
 		private static final String POINT_MEDIA = "point_media_tag";
 		private static final String POINT_SOURCE = "point_source_tag";
 	}
+
+
+	@Override
+	public void setSupportProgressBarIndeterminateVisibility(boolean visible) {
+		super.setSupportProgressBarIndeterminateVisibility(visible);
+		
+		updateFragments();
+		
+	};
+	
+	protected void updateFragments(){
+		
+		Log.i("Disc","*** UPDATE POINTS FRAGMENTS");
+		
+		if(mTabsAdapter!=null)
+		{
+			for(int i=0;i<mTabsAdapter.getCount();i++)
+			{
+				Fragment fr=mTabsAdapter.getItem(i);
+				//Fragment fr=getSupportFragmentManager().findFragmentByTag(FragmentTag.POINT_COMMENTS);
+				
+				if(fr==null)
+					Log.i("Disc","fragment NULL");
+				
+				if(fr instanceof PointCommentsTabFragment){
+					
+					Log.i("Disc","fragment instance PointCommentsTabFragment");
+					
+					
+					((PointCommentsTabFragment)fr).notifyFragmentCommentsChanged();
+				}
+				else
+				{
+					Log.i("Disc","fragment "+String.valueOf(fr));
+					
+				}
+			
+			}
+		}
+		else
+		{
+			Log.i("Disc","mTabsAdapter NULL");
+		}
+		/*
+		if(mTabsAdapter!=null)
+			mTabsAdapter.notifyDataSetChanged();
+		
+		if(mViewPager!=null)
+			mViewPager.invalidate();
+		//*/
+	}
+	
 }

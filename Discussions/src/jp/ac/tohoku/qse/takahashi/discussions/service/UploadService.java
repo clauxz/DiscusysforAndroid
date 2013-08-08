@@ -50,6 +50,7 @@ public class UploadService extends IntentService {
 	public static final int TYPE_INSERT_ATTACHMENT = 0x6;
 	public static final int TYPE_INSERT_COMMENT = 0x5;
 	public static final int TYPE_INSERT_COMMENTPERSONREADEDENTRY=0x9;
+	public static final int TYPE_INSERT_COMMENTPERSONREADEDENTRY_ARRAY=0xA;
 	public static final int TYPE_INSERT_DESCRIPTION = 0x3;
 	public static final int TYPE_INSERT_POINT_AND_DESCRIPTION = 0x4;
 	public static final int TYPE_INSERT_SOURCE = 0x7;
@@ -165,6 +166,9 @@ public class UploadService extends IntentService {
 				case TYPE_INSERT_COMMENTPERSONREADEDENTRY:
 					insertCommentPersonReadedEntry(intent);
 					break;
+				case TYPE_INSERT_COMMENTPERSONREADEDENTRY_ARRAY:
+					insertCommentPersonReadedEntryArray(intent);
+					break; 
 				case TYPE_INSERT_WPFCORK_COMMENTPLACEHOLDER:
 					WPFCork_insertCommentPlaceholder(intent);
 					break;
@@ -343,6 +347,40 @@ public class UploadService extends IntentService {
 		PhotonHelper.sendArgPointUpdated(selectedPoint, photonReceiver);
 		PhotonHelper.sendStatsEvent(StatsEvent.COMMENTPERSONREADEDENTRY_ADDED, selectedPoint, photonReceiver);
 	}
+	
+	private void insertCommentPersonReadedEntryArray(Intent intent){
+		
+		int ids[]=intent.getIntArrayExtra(ServiceExtraKeys.VALUE_INTEGER_ARRAY);
+		Bundle valueBundle=intent.getBundleExtra(ServiceExtraKeys.VALUE);
+		int LoggedPersonID=valueBundle.getInt(CommentsPersonReadEntry.Columns.PERSON_ID, Integer.MIN_VALUE);
+		
+		OdataWriteClient odataWrite=new OdataWriteClient(this);
+		
+		for(int entryCommentId:ids)
+		{
+			Bundle commentValues=new Bundle();
+			commentValues.putInt(CommentsPersonReadEntry.Columns.COMMENT_ID, entryCommentId);
+			commentValues.putInt(CommentsPersonReadEntry.Columns.PERSON_ID, LoggedPersonID);
+			
+			CommentPersonReadEntry commentEntry=new CommentPersonReadEntry(commentValues);
+			logd("[insertCommentPersonReadedEntry]  COMMENT ID:" + String.valueOf(commentEntry.getCommentId())
+					+" PERSON ID:"+String.valueOf(commentEntry.getPersonId()));
+			
+			//OdataWriteClient odataWrite=new OdataWriteClient(this);
+			OEntity entity=odataWrite.insertCommentPersonReadedEntry(commentEntry);
+			int commentEntryId=(Integer)entity.getProperty(CommentsPersonReadEntry.Columns.ID).getValue();
+			logd("[insertCommentEntry] new commentPersonReadedEntry id: " + commentEntryId);
+			commentEntry.setId(commentEntryId);
+			getContentResolver().insert(CommentsPersonReadEntry.CONTENT_URI, commentEntry.toContentValues());
+			
+		}
+		
+		SelectedPoint selectedPoint=getSelectedPointFromExtra(intent);
+		ResultReceiver photonReceiver = getPhotonReceiverFromExtra(intent);
+		PhotonHelper.sendArgPointUpdated(selectedPoint, photonReceiver);
+		PhotonHelper.sendStatsEvent(StatsEvent.COMMENTPERSONREADEDENTRY_ADDED, selectedPoint, photonReceiver);
+	}
+	
 	/**
 	 * WPF client comment feedback bug fix code. Used only until WPF client will not be fixed.
 	 * Such function only insert new comment placeholder which WPF client require. 

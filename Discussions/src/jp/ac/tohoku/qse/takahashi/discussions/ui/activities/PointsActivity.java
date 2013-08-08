@@ -40,6 +40,7 @@ import jp.ac.tohoku.qse.takahashi.discussions.ui.fragments.AllOtherUserPointList
 import jp.ac.tohoku.qse.takahashi.discussions.ui.fragments.OtherUserPointListFragment;
 import jp.ac.tohoku.qse.takahashi.discussions.ui.fragments.UserPointListFragment;
 import jp.ac.tohoku.qse.takahashi.discussions.utils.MyLog;
+import jp.ac.tohoku.qse.takahashi.discussions.utils.NotificationPoint;
 import jp.ac.tohoku.qse.takahashi.discussions.utils.fragmentasynctask.SyncStatusUpdaterFragment;
 
 public class PointsActivity extends BaseActivity implements PhotonServiceCallback {
@@ -55,6 +56,7 @@ public class PointsActivity extends BaseActivity implements PhotonServiceCallbac
 	PagerTitleStrip pagerTitleStrip;
 	private SyncStatusUpdaterFragment mSyncStatusUpdaterFragment;
 
+	
 	private boolean showExtMenu;
 	@Override
 	public void onArgPointChanged(final ArgPointChanged argPointChanged) {
@@ -189,6 +191,7 @@ public class PointsActivity extends BaseActivity implements PhotonServiceCallbac
 		pagerTitleStrip = (PagerTitleStrip) findViewById(R.id.pagerTitleStrip);
 		pagerTitleStrip.setTextSize(TypedValue.COMPLEX_UNIT_SP, 24);
 		pagerTitleStrip.setPadding(5, 10, 10, 5);
+		
 		
 		
 		getSupportLoaderManager().initLoader(PersonsCursorLoader.LOADER_TOPIC_PERSONS, null,
@@ -346,10 +349,11 @@ public class PointsActivity extends BaseActivity implements PhotonServiceCallbac
 
 		private void initializePaging(final Cursor cursor) {
 
+			/*
 			for(String name:cursor.getColumnNames()){
 				Log.i("Disc cursor name",String.valueOf(name));
 			}
-			
+			//*/
 			List<Fragment> fragments = new Vector<Fragment>();
 			Bundle otherUsersArguments = new Bundle(3);
 			otherUsersArguments.putInt(ExtraKey.PERSON_ID, mPersonId);

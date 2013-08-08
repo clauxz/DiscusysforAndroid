@@ -22,13 +22,18 @@ public final class DiscussionsContract {
 	/** A domain name for the {@link DiscussionsProvider} */
 	public static final String CONTENT_AUTHORITY = "jp.ac.tohoku.qse.takahashi.discussions";
 	static final Uri BASE_CONTENT_URI = Uri.parse("content://" + CONTENT_AUTHORITY);
-
+	
+	
 	/** A private Constructor prevents class from instantiating. */
 	private DiscussionsContract() {
 
 		throw new UnsupportedOperationException("Class is prevented from instantiation");
 	}
 
+	public static String getBaseUrl(){
+		return Uri.parse("content://" + CONTENT_AUTHORITY).toString();
+	}
+	
 	/** Describes attachments's table. */
 	public static final class Attachments {
 
@@ -758,6 +763,8 @@ public final class DiscussionsContract {
 			public static final String TOPIC_ID = "Topic";
 			/** Type Int.*/
 			public static final String ISNEW = "IsNew"; //isnew point flag
+			
+			public static final String IsReadedPointFlag="IsReadedPointFlag";
 		}
 
 		public static final class PointChangedType {
