@@ -127,14 +127,6 @@ public class PointCommentsTabFragment extends SherlockFragment implements OnClic
 		initCommentsLoader();
 			
 	}
-	/*
-	private void initReadedComments(){
-		
-		notificationComment=new NotificationComment(getActivity(),mLoggedInPersonId);
-			
-	}
-	//*/
-
 
 	@Override
 	public void onCreateContextMenu(final ContextMenu menu, final View v, final ContextMenuInfo menuInfo) {
@@ -179,8 +171,6 @@ public class PointCommentsTabFragment extends SherlockFragment implements OnClic
 		int commentId = cursor.getInt(commentIdIndex);
 		int commentIsNew=cursor.getInt(commentIsNewIndex);
 		Uri commentUri = Comments.buildTableUri(commentId);
-		
-		Log.i("Disc URI COM",String.valueOf(commentUri.toString()));
 		
 		Intent commentIntent = new Intent(Intent.ACTION_VIEW, commentUri);
 		
@@ -255,24 +245,6 @@ public class PointCommentsTabFragment extends SherlockFragment implements OnClic
 			throw new IllegalStateException("fragment was called without logged in person id extra");
 		}
 		
-		/*
-		if (!arguments.containsKey(ExtraKey.TOPIC_ID)) {
-			throw new IllegalStateException("fragment was called without logged in topic id extra");
-		}
-		if(arguments.containsKey(ExtraKey.SESSION_ID)
-				&& arguments.getInt(ExtraKey.SESSION_ID)!=0) // zore session is not exist ( not experiment mode)
-		{
-			//this.showExtMenu=true;
-			mSessionId=arguments.getInt(ExtraKey.SESSION_ID);
-			Log.v("Discussions","[Session ID] exists");
-		}
-		else
-		{
-			//this.showExtMenu=false;
-			mSessionId=Integer.MIN_VALUE;
-			Log.v("Discussions","[Session ID] not exists");
-		}
-		//*/
 		
 		mSelectedPoint = arguments.getParcelable(ExtraKey.SELECTED_POINT);
 		mLoggedInPersonId = arguments.getInt(ExtraKey.ORIGIN_PERSON_ID, Integer.MIN_VALUE);
@@ -324,14 +296,9 @@ public class PointCommentsTabFragment extends SherlockFragment implements OnClic
 		int columnIndex = cursor.getColumnIndexOrThrow(Comments.Columns.ID);
 		int commentId = cursor.getInt(columnIndex);
 		((BaseActivity) getActivity()).getServiceHelper().deleteComment(commentId, mSelectedPoint);
-		//*/
-		
-		
 	}
 	
 	protected void onInsertCommentReadEntry(){
-		
-		Log.i("Disc","Add CommentsReadedPersonEntitires ARRAY");
 		Cursor cursor=mCommentsAdapter.getCursor();
 		
 		if(cursor!=null)// && 0<cursor.getCount())
@@ -357,8 +324,6 @@ public class PointCommentsTabFragment extends SherlockFragment implements OnClic
 					}				
 				}
 				
-				Log.i("Disc","ADD arr comments list SIZE:"+String.valueOf(comments.size()));
-				
 				if(0<comments.size())
 				{
 					Bundle commentValues=new Bundle();
@@ -370,24 +335,13 @@ public class PointCommentsTabFragment extends SherlockFragment implements OnClic
 						dataArr[i]=comments.get(i);
 					}
 					
-					Log.i("Disc","ADD arr comments arr LENTH:"+String.valueOf(dataArr.length));
-					
 					((BaseActivity) getActivity()).getServiceHelper()
 						.insertCommentPersonReadedEntities(commentValues, mSelectedPoint,dataArr);
 					
 					mCommentsAdapter.notifyDataSetChanged();
 				}
 			}
-			else
-			{
-				Log.i("Disc","ADD arr CURSOR SIZE:"+String.valueOf(cursor.getCount()));
-			}
 		}
-		else
-		{
-			Log.i("Disc","ADD arr CURSOR NULL");
-		}
-		
 	}
 		
 	
@@ -401,17 +355,6 @@ public class PointCommentsTabFragment extends SherlockFragment implements OnClic
 
 			@Override
 			public boolean setViewValue(final View view, final Cursor cursor, final int columnIndex) {
-
-				/*
-				for(String name:cursor.getColumnNames()){
-					int index=cursor.getColumnIndex(name);
-					String value=cursor.getString(index);
-					Log.i("Disc comment","column:"+String.valueOf(index)
-							+" "+name+" "+value);
-				}
-				Log.i("------------","-------------------");
-				//*/
-				
 				switch (view.getId()) {
 					case R.id.image_person_color:
 						ImageView colorView = (ImageView) view;
@@ -434,23 +377,9 @@ public class PointCommentsTabFragment extends SherlockFragment implements OnClic
 							((ImageView)view).setImageBitmap(
 									BitmapFactory.decodeResource(getResources(), R.drawable.ic_data_changed));
 						}
-						else
-						{
+						else{
 							((ImageView)view).setImageBitmap(null);
 						}
-						/*
-						int index=cursor.getColumnIndex(Comments.Columns.IsReadedFlag);
-						int isNew=cursor.getInt(index);
-						
-						if(ApplicationConstants.OBJECT_NEW==isNew){
-							((ImageView)view).setImageBitmap(
-									BitmapFactory.decodeResource(getResources(), R.drawable.ic_data_changed));
-						}
-						else
-						{
-							((ImageView)view).setImageBitmap(null);
-						}
-						//*/
 					}
 					return true;
 					default:
@@ -516,61 +445,38 @@ public class PointCommentsTabFragment extends SherlockFragment implements OnClic
 				{
 					if(0<cursor.getCount())
 					{
-					cursor.moveToFirst();
-					do
-					{
-						int indexId=cursor.getColumnIndexOrThrow(Comments.Columns.ID);
-						int indexCommentPoint=cursor.getColumnIndexOrThrow(Comments.Columns.POINT_ID);
-						
-						int id=cursor.getInt(indexId);
-						int pointId=cursor.getInt(indexCommentPoint);
-						
-						if(pointId==mSelectedPoint.getPointId())
+						cursor.moveToFirst();
+						do
 						{
-							if(!notificationComment.IsPersonReadedComment(mLoggedInPersonId,id))
+							int indexId=cursor.getColumnIndexOrThrow(Comments.Columns.ID);
+							int indexCommentPoint=cursor.getColumnIndexOrThrow(Comments.Columns.POINT_ID);
+							
+							int id=cursor.getInt(indexId);
+							int pointId=cursor.getInt(indexCommentPoint);
+							
+							if(pointId==mSelectedPoint.getPointId())
 							{
-								com=true;
-								((PointDetailsActivity)getActivity()).setNewComments(com);
-								//((PointDetailsActivity)getActivity()).updateCommentIcon();
-								
-								Log.i("++++++++++++++++",String.valueOf(com));
-								return;
+								if(!notificationComment.IsPersonReadedComment(mLoggedInPersonId,id))
+								{
+									com=true;
+									((PointDetailsActivity)getActivity()).setNewComments(com);
+									return;
+								}
 							}
-						}
-						
-					}while(cursor.moveToNext());
-					}
-					else
-					{
-						Log.i("Disc updateComment","cursor size:"+String.valueOf(cursor.getCount()));
+							
+						}while(cursor.moveToNext());
 					}
 				}
-				else
-				{
-					Log.i("Disc updateComment","cursor NULL");
-				}
-			}
-			else
-			{
-				Log.i("Disc updateComment","mCommentsAdapter NULL");
-			}
-			Log.i("--------------",String.valueOf(com));
-			
-			((PointDetailsActivity)getActivity()).setNewComments(com);
-			//((PointDetailsActivity)getActivity()).updateCommentIcon();
+			}((PointDetailsActivity)getActivity()).setNewComments(com);
 		}		
 	}
 	
 	public void notifyFragmentCommentsChanged(){
-		
 		updateCommentsStatus();
 		
-		if(mCommentsAdapter!=null)
-		{
+		if(mCommentsAdapter!=null){
 			mCommentsAdapter.notifyDataSetChanged();
 		}
-		else
-			Log.i("Disc","mCommentsAdapter NULL");
 	}
 	
 	private static AdapterContextMenuInfo castAdapterContextMenuInfo(final ContextMenuInfo contextMenuInfo) {
@@ -634,16 +540,9 @@ public class PointCommentsTabFragment extends SherlockFragment implements OnClic
 
 		@Override
 		public void onLoadFinished(final Loader<Cursor> loader, final Cursor data) {
-
 			if (DEBUG) {
 				Log.d(TAG, "[onLoadFinished] cursor count: " + data.getCount() + ", id: " + loader.getId());
 			}
-			
-			/*
-			for(String name:data.getColumnNames()){
-				Log.i("Disc * column Name",String.valueOf(name));
-			}
-			//*/
 			
 			switch (loader.getId()) {
 				case COMMENTS_ID:

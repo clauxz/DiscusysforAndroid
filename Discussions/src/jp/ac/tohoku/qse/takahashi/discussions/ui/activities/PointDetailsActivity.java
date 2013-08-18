@@ -503,9 +503,6 @@ public class PointDetailsActivity extends BaseActivity
 	};
 	
 	protected void updateFragments(){
-		
-		Log.i("Disc","*** UPDATE POINTS FRAGMENTS");
-		
 		if(mTabsAdapter!=null)
 		{
 			for(int i=0;i<mTabsAdapter.getCount();i++)
@@ -513,35 +510,12 @@ public class PointDetailsActivity extends BaseActivity
 				Fragment fr=mTabsAdapter.getItem(i);
 				//Fragment fr=getSupportFragmentManager().findFragmentByTag(FragmentTag.POINT_COMMENTS);
 				
-				if(fr==null)
-					Log.i("Disc","fragment NULL");
-				
 				if(fr instanceof PointCommentsTabFragment){
-					
-					Log.i("Disc","fragment instance PointCommentsTabFragment");
-					
-					
 					((PointCommentsTabFragment)fr).notifyFragmentCommentsChanged();
 				}
-				else
-				{
-					Log.i("Disc","fragment "+String.valueOf(fr));
-					
-				}
-			
 			}
 		}
-		else
-		{
-			Log.i("Disc","mTabsAdapter NULL");
-		}
-		/*
-		if(mTabsAdapter!=null)
-			mTabsAdapter.notifyDataSetChanged();
-		
-		if(mViewPager!=null)
-			mViewPager.invalidate();
-		//*/
+
 	}
 	
 }

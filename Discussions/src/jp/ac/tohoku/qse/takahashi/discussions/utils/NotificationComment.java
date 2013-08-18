@@ -35,26 +35,9 @@ public class NotificationComment {
 							DiscussionsContract.CONTENT_AUTHORITY)
 							.getLocalContentProvider();
 			
-			
 			if(provider!=null)
 			{
 				Uri uri=Uri.parse(DiscussionsContract.getBaseUrl()+"//"+ CommentsPersonReadEntry.A_TABLE_PREFIX);
-				
-				Log.i("Disc","Provider:"+provider.toString());
-				
-				/*
-				Cursor cursor=provider.query(uri, 
-								new String[]{
-									BaseColumns._ID,
-									CommentsPersonReadEntry.Columns.ID,
-									CommentsPersonReadEntry.Columns.COMMENT_ID,
-									CommentsPersonReadEntry.Columns.PERSON_ID},  
-								CommentsPersonReadEntry.Columns.PERSON_ID+"=" + String.valueOf(LoggedInPersonId),
-								new String[] {String.valueOf(LoggedInPersonId)},
-								CommentsPersonReadEntry.Columns.ID+" ASC");
-				//*/
-				
-				
 				Cursor cursor=provider.query(uri, 
 						new String[]{
 							BaseColumns._ID,
@@ -62,11 +45,8 @@ public class NotificationComment {
 							CommentsPersonReadEntry.Columns.COMMENT_ID,
 							CommentsPersonReadEntry.Columns.PERSON_ID},  
 						null,null,CommentsPersonReadEntry.Columns.ID+" ASC");
-				//*/
-				
 				
 				if(cursor!=null){
-					Log.i("Disc","Cursor size:"+String.valueOf(cursor.getCount()));
 					this.readed.clear();
 					cursor.moveToFirst();
 					
@@ -78,17 +58,9 @@ public class NotificationComment {
 							
 						}while(cursor.moveToNext());
 					
-					//Log.i("Disc","*** readed size:"+String.valueOf(readed.size()));
 				cursor.close();
 				
 				}
-				else
-				{
-					Log.i("Disc","Cursor = null");
-				}
-			}
-			else{
-				Log.i("Disc","Provider null");
 			}
 		}
 	}
@@ -98,21 +70,14 @@ public class NotificationComment {
 	}
 	
 	public boolean IsPersonReadedComment(final int personID,final int commentId){
-		
-		Log.i("Disc","readed size:"+String.valueOf(readed.size()));
-		
 		for(int i=0;i<this.readed.size();i++){
 			CommentPersonReadEntry comment=this.readed.get(i);
-			
 			if(personID==comment.getPersonId()
 					&&
-					commentId==comment.getCommentId())
-			{
-				Log.i("Disc comment readed","coment:"+ comment.getCommentId()+" person:"+comment.getPersonId());
+					commentId==comment.getCommentId()){
 				return true;
 			}
 		}
-		
 		return false;
 	}
 	

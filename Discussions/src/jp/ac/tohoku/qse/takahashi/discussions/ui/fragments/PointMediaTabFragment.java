@@ -179,7 +179,6 @@ public class PointMediaTabFragment extends SherlockFragment implements OnClickLi
 
 		switch (item.getItemId()) {
 			case R.id.menu_delete_attachements:
-				//Log.i("Disc","delete attachements");
 				onActionDeleteAttachment(item);
 				return true;
 			default:
@@ -385,7 +384,6 @@ public class PointMediaTabFragment extends SherlockFragment implements OnClickLi
 			
 			switch (newAttachment.type) {
 				case PICK_CAMERA_PHOTO:
-					Log.i("Disc","attache photos");
 					onAttachSourceAdded(newAttachment.uri, Attachments.AttachmentType.JPG);
 					break;
 				case PICK_IMAGE_REQUEST:
@@ -423,18 +421,12 @@ public class PointMediaTabFragment extends SherlockFragment implements OnClickLi
 		if (data == null) 
 		{
 			newAttachment = new NewAttachment(PICK_CAMERA_PHOTO, tempCameraFileUri);
-			
-			Log.i("Disc handleCameraResult","data:"+String.valueOf(tempCameraFileUri));
-			
 			if (((BaseActivity) getActivity()).isBound()) {
 				onServiceConnected();
 			}
 		} else if (data.getData() != null) 
 		{
 			newAttachment = new NewAttachment(PICK_CAMERA_PHOTO, data.getData());
-			
-			Log.i("Disc handleCameraResult","data.getData()"+String.valueOf(tempCameraFileUri));
-			
 			if (((BaseActivity) getActivity()).isBound()) {
 				onServiceConnected();
 			}
@@ -461,9 +453,6 @@ public class PointMediaTabFragment extends SherlockFragment implements OnClickLi
 	}
 
 	private void onAttachSourceAdded(final Uri uri, final int attachmentType) {
-
-		Log.i("Disc","URL:"+String.valueOf(uri));
-		
 		onAttachSourceAdded(uri, attachmentType, "");
 	}
 

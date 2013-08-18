@@ -68,16 +68,14 @@ public class NotificationPoint {
 			
 			
 			
-			//*
 			String selectionPoint=null;
 			String[] selectionArgsPoint=null;
 			String sortOrderPoint=null;
-			//*/
+			
 			String selectionComment=null;
 			String[] selectionArgsComment=null;
 			String sortOrderComment=Comments.TABLE_NAME+"."+Comments.Columns.ID+" ASC";
 			
-			//*
 			switch(this.mMode){
 				default:
 				case MODE_USER:
@@ -99,7 +97,6 @@ public class NotificationPoint {
 					break;
 			}
 			
-			//*
 			Cursor cursorPoint=provider.query(uriPoint,
 					new String[]{BaseColumns._ID, 
 					Points.Columns.ID,
@@ -114,10 +111,7 @@ public class NotificationPoint {
 					Points.Columns.ORDER_NUMBER,
 					Persons.Qualified.PERSON_ID},
 					selectionPoint, selectionArgsPoint, sortOrderPoint);
-			
-			Log.i("Disc","CURSOR POINT SIZE:"+String.valueOf(cursorPoint.getCount()));
-			
-			
+		
 			if(cursorPoint!=null)
 			{
 				this.points.clear();
@@ -133,7 +127,6 @@ public class NotificationPoint {
 					}while(cursorPoint.moveToNext());
 				}
 				cursorPoint.close();
-			//*/
 			}
 				
 			Cursor cursorComment=provider.query(uriComments,
@@ -145,8 +138,6 @@ public class NotificationPoint {
 					Comments.Columns.POINT_ID						
 					}, 
 					null, null, sortOrderComment);
-			
-			Log.i("Disc","CURSOR COMMENTS SIZE:"+String.valueOf(cursorComment.getCount()));
 			
 			if(cursorComment!=null)
 			{
@@ -162,9 +153,6 @@ public class NotificationPoint {
 						   comments.add(rComment);				
 					}while(cursorComment.moveToNext());
 					
-					
-					Log.i("Disc","COMMENTS ARRAY SIZE:"+String.valueOf(comments.size()));
-					
 					for(int comI=0;comI<comments.size();comI++){
 						Comment com=comments.get(comI);
 						NotificationComment nCom=new NotificationComment(context,mLoggedPerson);
@@ -177,10 +165,7 @@ public class NotificationPoint {
 							commentFlag.put(com.getId(), false);
 						}
 					}
-					
-					Log.i("Disc","COMMENTS FLAG MAPTREE SIZE:"+String.valueOf(commentFlag.size()));
-				}
-				
+				}				
 				cursorComment.close();
 			}
 		}
@@ -193,30 +178,18 @@ public class NotificationPoint {
 	 */
 	public boolean IsPointContainNewComments(//final int personID,final int pointId){
 			                             final int pointId){
-		
-		/*
-		for(int i=0;i<points.size();i++){
-			Point point=points.get(i);
+				
+		for(int j=0;j<comments.size();j++){
+			Comment comment=comments.get(j);
 			
-			if(point.getId()==pointId){
-			//*/
+			if(pointId==comment.getPointId()){
 				
-				for(int j=0;j<comments.size();j++){
-					Comment comment=comments.get(j);
-					
-					if(pointId==comment.getPointId()){
-						
-						boolean flag=commentFlag.get(comment.getId());
-						
-						if(flag==true)
-							return true;
-					}
-				}
-			/*
+				boolean flag=commentFlag.get(comment.getId());
+				
+				if(flag==true)
+					return true;
 			}
-		}
-		//*/
-				
+		}				
 		return false;
 	}
 	public boolean IsContainNewCommentsInTopic(int topicId)

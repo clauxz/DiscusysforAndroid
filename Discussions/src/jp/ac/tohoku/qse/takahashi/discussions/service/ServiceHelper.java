@@ -172,7 +172,6 @@ public class ServiceHelper {
 		mContext.startService(intent);
 	}
 	
-	//*
 	public void insertCommentPersonReadedEntities(final Bundle commentValues,final SelectedPoint selectedPoint,final int[] commentsIDs){
 		
 		Intent intent=new Intent(IntentAction.UPLOAD);
@@ -184,7 +183,6 @@ public class ServiceHelper {
 		intent.putExtra(ServiceExtraKeys.PHOTON_RECEIVER, mPhotonController.getResultReceiver());
 		mContext.startService(intent);
 	}
-	//*/
 	/**
 	 * Function used only for fixing WPF client bug. In future such function need to delete when 
 	 * WPF client will be fixed (wpf client will change algorithm for comment adding and placeholder functionality).

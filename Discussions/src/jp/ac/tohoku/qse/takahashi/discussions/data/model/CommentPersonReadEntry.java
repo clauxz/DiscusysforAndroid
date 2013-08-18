@@ -62,10 +62,7 @@ public class CommentPersonReadEntry implements Value{
 			id=Integer.MIN_VALUE;
 			personId=Integer.MIN_VALUE;
 			commentId=Integer.MIN_VALUE;
-		}
-		
-		//Log.i("Disc CommentReadedEntry","id:"+String.valueOf(id)+" commentId:"+String.valueOf(commentId)+
-		//		" personId:"+String.valueOf(personId));
+		}	
 	}
 	
 	public int getId() {

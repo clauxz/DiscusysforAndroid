@@ -61,10 +61,8 @@ public class CommentDetailsActivity extends BaseActivity implements PhotonServic
 	
 	@Override
 	protected void onCreate(final Bundle savedInstanceState) {
-
 		super.onCreate(savedInstanceState);
 		initFromIntentExtra();
-		Log.i("Disc",CommentDetailsActivity.class.getSimpleName()+" onCreate");
 		setContentView(R.layout.activity_comment);
 		getSupportActionBar().setDisplayShowHomeEnabled(false);
 		commentTextView = (TextView) findViewById(R.id.textViewComment);
@@ -75,16 +73,7 @@ public class CommentDetailsActivity extends BaseActivity implements PhotonServic
 
 	
 	private void connectPhoton() {
-
-		Log.i("Disc","connectPhoton: " + mBound + " " + mService.getPhotonController().isConnected());
 		MyLog.v(TAG, "connectPhoton: " + mBound + " " + mService.getPhotonController().isConnected());
-		/*
-		if (mBound && !mService.getPhotonController().isConnected()) {
-			mService.getPhotonController().connect(this, mDiscussionId,
-					PreferenceHelper.getPhotonDbAddress(this), mPersonName, mPersonId);
-			mService.getPhotonController().getCallbackHandler().addCallbackListener(this);
-		}
-		//*/
 	}
 	
 	private void startCommentsLoader() {
@@ -115,85 +104,22 @@ public class CommentDetailsActivity extends BaseActivity implements PhotonServic
 		if (!getIntent().hasExtra(ExtraKey.COMMENT_NEW_FLAG)) {
 			throw new IllegalStateException("Activity intent was without comment ISNEW flag");
 		}
-		/*
-		if(getIntent().hasExtra(ExtraKey.SESSION_ID)
-				&& getIntent().getExtras().getInt(ExtraKey.SESSION_ID)!=0) // zore session is not exist ( not experiment mode)
-		{
-			this.showExtMenu=true;
-			mSessionId=getIntent().getExtras().getInt(ExtraKey.SESSION_ID);
-			Log.v("Discussions","[Session ID] exists");
-		}
-		else
-		{
-			this.showExtMenu=false;
-			mSessionId=Integer.MIN_VALUE;
-			Log.v("Discussions","[Session ID] not exists");
-		}
-		//*/
+		
 		mLoggedPersonID = getIntent().getExtras().getInt(ExtraKey.ORIGIN_PERSON_ID);
 		//mTopicId = getIntent().getExtras().getInt(ExtraKey.TOPIC_ID);
 		mSelectedPoint = getIntent().getExtras().getParcelable(ExtraKey.SELECTED_POINT);
 		mSelectedCommentId=getIntent().getExtras().getInt(ExtraKey.SELECTED_COMMENT);
 		mIsNewComment=getIntent().getExtras().getBoolean(ExtraKey.COMMENT_NEW_FLAG);
 		
-		//Log.i("Disc","onCreate");
 		
-		/*
-		if (mTopicId == -1) {
-			throw new IllegalStateException("Activity intent has illegal topic id -1");
-		}
-		/*/
-		/*
-		mDiscussionId = getIntent().getExtras().getInt(ExtraKey.DISCUSSION_ID);
-		if (DEBUG) {
-			Log.d(TAG, "[initFromIntentExtras] personId: " + mPersonId + ", topicId: " + mTopicId
-					+ ", discussionId: " + mDiscussionId + ", personName: " + mPersonName);
-		}
-		//*/
 	}
 
-	/*
-	private void initVars(Bundle bundle){
-		if(bundle!=null)
-		{
-			mLoggedPersonID=bundle.getInt(ExtraKey.ORIGIN_PERSON_ID);
-			mTopicId=bundle.getInt(ExtraKey.TOPIC_ID, Integer.MIN_VALUE);
-			mSelectedCommentId=bundle.getInt(ExtraKey.SELECTED_COMMENT);
-			mIsNewComment=bundle.getBoolean(ExtraKey.COMMENT_NEW_FLAG);
-			
-			Log.i("Disc COMEMNT","PERSON ID:"+String.valueOf(mLoggedPersonID)
-					+" COMMENT ID:"+String.valueOf(mSelectedCommentId)+" IS NEW:"
-					+String.valueOf(mIsNewComment));
-			
-			mSelectedPoint = bundle.getParcelable(ExtraKey.SELECTED_POINT);
-		}
-		else
-		{
-			mLoggedPersonID=Integer.MIN_VALUE;
-			mSelectedCommentId=Integer.MIN_VALUE;
-			mIsNewComment=false;
-		}	
-	}
-	//*/
-	
 	private void markReadedComment()
 	{
 		Bundle commentValues=new Bundle();
 		commentValues.putInt(CommentsPersonReadEntry.Columns.COMMENT_ID, mSelectedCommentId);
 		commentValues.putInt(CommentsPersonReadEntry.Columns.PERSON_ID, mLoggedPersonID);
-		//*
-		Log.i("Disc markReadedComment","commentValues:"+String.valueOf(commentValues));
-		Log.i("Disc markReadedComment","mSelectedPoint:"+String.valueOf(mSelectedPoint));
-		//mConnection
-		//mService
-		Log.i("Disc markReadedComment","mConnection:"+String.valueOf(mConnection));
-		Log.i("Disc markReadedComment","mService:"+String.valueOf(mService));
-		Log.i("Disc markReadedComment","getServiceHelper():"+String.valueOf(getServiceHelper()));
-		//*/
-		
 		getServiceHelper().insertCommentPersonReadedEntry(commentValues, mSelectedPoint);
-		
-		Log.i("Disc","markReadedComment");
 	}
 	
 	private class CommentLoader implements LoaderCallbacks<Cursor> {

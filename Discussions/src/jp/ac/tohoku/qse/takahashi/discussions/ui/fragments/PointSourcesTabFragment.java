@@ -163,9 +163,6 @@ public class PointSourcesTabFragment extends SherlockFragment implements
 	@Override
 	public void onItemClick(final AdapterView<?> parent, 
 			final View view, final int position, final long id) {
-
-		Log.i("Disc","DIALOG:"+String.valueOf(isDeleteDialogShow=true));
-		
 		//if(isDeleteDialogShow)//block onClick event if onLoncgEvent shows delete URL dialog
 		{
 			TextView linkTextView = (TextView) view.findViewById(R.id.text_source_link);
@@ -192,8 +189,6 @@ public class PointSourcesTabFragment extends SherlockFragment implements
 		CharSequence urlSequence = linkTextView.getText();
 		if (!TextUtils.isEmpty(urlSequence)) {
 			Uri uri = Uri.parse(urlSequence.toString());
-			//Intent intent = new Intent(Intent.ACTION_VIEW, uri);
-			//Log.i("Disc url",String.valueOf(uri.toString()));
 			mPositionClick=position-1;
 			showDeleteUrlDialog(uri);
 		}
@@ -206,29 +201,20 @@ public class PointSourcesTabFragment extends SherlockFragment implements
 		AlertDialog.Builder builder=new Builder(getActivity());
 		builder.setTitle(R.string.dialog_title_delete_url);
 		builder.setPositiveButton(R.string.button_title_ok, new DialogInterface.OnClickListener() {
-			
 			@Override
 			public void onClick(DialogInterface dialog, int which) {
-				//Log.i("Disc","delete url OK");
-				//String id=Sources.getValueId(uri);
-				//Log.i("Disc","ID:"+String.valueOf(id));
 				isDeleteDialogShow=false;
 				deleteUrl();//id);
 				
 			}
 		});
 		builder.setNegativeButton(R.string.button_title_cancel, new DialogInterface.OnClickListener() {
-			
 			@Override
 			public void onClick(DialogInterface dialog, int which) {
-				// TODO Auto-generated method stub
-				//Log.i("Disc","detele url CANCEL");
 				isDeleteDialogShow=false;
 			}
 		});
-		
 		builder.setMessage(uri.toString());
-		
 		
 		Dialog dialog=builder.create();
 		dialog.show();

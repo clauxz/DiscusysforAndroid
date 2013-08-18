@@ -90,16 +90,6 @@ public class UserPointListFragment extends SherlockListFragment {
 							{
 								((ImageView)view).setImageBitmap(null);
 							}
-							/*
-							if(isNew>0){
-								((ImageView)view).setImageBitmap(
-										BitmapFactory.decodeResource(getResources(), R.drawable.ic_data_changed));
-							}
-							else
-							{
-								((ImageView)view).setImageBitmap(null);
-							}
-							//*/
 						}
 						return true;
 					default:
@@ -165,52 +155,6 @@ public class UserPointListFragment extends SherlockListFragment {
 
 	protected void updateCommentsStatus(){
 		notificationPoint=new NotificationPoint(getActivity(),mPersonId,mTopicId,NotificationPoint.MODE_ALL_USERS);
-		/*
-		if(getActivity() instanceof PointDetailsActivity){
-			boolean com=false;
-			
-			ArrayList<Integer> ids=new ArrayList<Integer>();
-			
-			if(mUserPointsAdapter!=null)
-			{
-				Cursor cursor=mUserPointsAdapter.getCursor();
-				cursor.moveToFirst();
-				
-				if(cursor!= null && 0<cursor.getCount()){
-					
-					do
-					{
-						int index=cursor.getColumnIndex(Points.Columns.ID);
-						int indexTopic=cursor.getColumnIndexOrThrow(Points.Columns.TOPIC_ID);
-						int id=cursor.getInt(index);
-						int topic=cursor.getInt(indexTopic);
-						
-						if(topic==mTopicId && id!=Integer.MIN_VALUE)
-							{
-								if(notificationPoint.IsPointContainNewComments(id))
-								{
-									com=true;
-									((PointDetailsActivity)getActivity()).setNewComments(com);
-									((PointDetailsActivity)getActivity()).updateCommentIcon();
-									
-									Log.i("--------------","1111111111111111111111111111111");
-									
-									
-									return;
-								}
-							}
-					}while(cursor.moveToNext());
-					
-					
-				}
-			}
-			
-			Log.i("--------------","0000000000000000000000");
-			
-			((PointDetailsActivity)getActivity()).setNewComments(com);
-			((PointDetailsActivity)getActivity()).updateCommentIcon();
-		}
-		//*/
 	}
 	
 	private class UserPointsCursorLoader implements LoaderManager.LoaderCallbacks<Cursor> {

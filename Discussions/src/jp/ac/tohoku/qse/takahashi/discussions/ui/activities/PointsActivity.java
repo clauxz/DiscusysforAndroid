@@ -86,17 +86,13 @@ public class PointsActivity extends BaseActivity implements PhotonServiceCallbac
 	public boolean onCreateOptionsMenu(final com.actionbarsherlock.view.Menu menu) {
 
 		MenuInflater menuInflater = getSupportMenuInflater();
-		if(this.showExtMenu==true)
-		{
+		if(this.showExtMenu==true){
 			menuInflater.inflate(R.menu.actionbar_points_ext, menu);
 		}
-		else
-		{
+		else{
 			menuInflater.inflate(R.menu.actionbar_points, menu);
 		}
 				
-		//Log.i("Disc","onCreate option menu");
-		
 		// Calling super after populating the menu is necessary here to ensure that the
 		// action bar helpers have a chance to handle this event.
 		return super.onCreateOptionsMenu(menu);
@@ -261,12 +257,6 @@ public class PointsActivity extends BaseActivity implements PhotonServiceCallbac
 		mPersonId = getIntent().getExtras().getInt(ExtraKey.PERSON_ID);
 		mTopicId = getIntent().getExtras().getInt(ExtraKey.TOPIC_ID);
 		
-		
-		
-		
-		//Log.i("Disc","onCreate");
-		
-		
 		if (mTopicId == -1) {
 			throw new IllegalStateException("Activity intent has illegal topic id -1");
 		}
@@ -349,11 +339,6 @@ public class PointsActivity extends BaseActivity implements PhotonServiceCallbac
 
 		private void initializePaging(final Cursor cursor) {
 
-			/*
-			for(String name:cursor.getColumnNames()){
-				Log.i("Disc cursor name",String.valueOf(name));
-			}
-			//*/
 			List<Fragment> fragments = new Vector<Fragment>();
 			Bundle otherUsersArguments = new Bundle(3);
 			otherUsersArguments.putInt(ExtraKey.PERSON_ID, mPersonId);

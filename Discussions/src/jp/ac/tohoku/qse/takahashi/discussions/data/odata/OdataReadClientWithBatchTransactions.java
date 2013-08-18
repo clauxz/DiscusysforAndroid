@@ -167,33 +167,15 @@ public class OdataReadClientWithBatchTransactions extends BaseOdataClient {
 		deleteAllValues(CommentsPersonReadEntry.CONTENT_URI);
 		Enumerable<OEntity> commentsPersonEntries;
 		
-		
-		if(ApplicationConstants.ODATA_SANITIZE)
-		{
-			Log.i("Disc","person entities");
+		if(ApplicationConstants.ODATA_SANITIZE)		{
 			commentsPersonEntries=getCommentsPersonEntryEntities();
 		}
-		else
-		{
-			Log.i("Disc","filtered person entities");
+		else{
 			commentsPersonEntries=getFilteredCommentsPersonEntryEntities();
 		}
 		
-		
-		Log.i("Disc","insertCommentPersonEntry count:"+String.valueOf(commentsPersonEntries.count()));
-		
-		
 		for(OEntity commentPersonEntry:commentsPersonEntries){
-			//Log.i("Disc item","name:"+commentPersonEntry.getEntitySetName()+" tag:"
-			//		+commentPersonEntry.getEntityTag());
-	
-			Log.i("Disc item",commentPersonEntry.toString());
-			
-			//for(OProperty property:commentPersonEntry.getProperties()){			
-			//	Log.i("Disc property",property.toString());
-			//}
-			
-			insertCommentPersonEntry(commentPersonEntry);
+				insertCommentPersonEntry(commentPersonEntry);
 		}
 	}
 	
@@ -514,8 +496,6 @@ public class OdataReadClientWithBatchTransactions extends BaseOdataClient {
 			cv.put(Comments.Columns.POINT_ID, getAsInt(point, Points.Columns.ID));
 			cv.put(Comments.Columns.PERSON_ID, getAsInt(person, Persons.Columns.ID));
 			
-			Log.i("Disc insertComment","ContentValues: "+String.valueOf(cv.toString()));
-			
 			insertValues(Comments.CONTENT_URI, cv);
 		}
 	}
@@ -527,16 +507,12 @@ public class OdataReadClientWithBatchTransactions extends BaseOdataClient {
 		OEntity comment=commentpersonEntity.getLink(Comments.TABLE_NAME, ORelatedEntityLinkInline.class).getRelatedEntity();
 		OEntity person=commentpersonEntity.getLink(Persons.TABLE_NAME,ORelatedEntityLinkInline.class).getRelatedEntity();
 		
-		//Log.i("Disc","comment:"+String.valueOf(comment)+" person:"+String.valueOf(person));
-		
 		if(comment==null || person==null){
 			sanitizeEntity(commentpersonEntity, CommentsPersonReadEntry.TABLE_NAME, CommentsPersonReadEntry.Columns.ID);
 		}else{
 			ContentValues cv=OEntityToContentValue(commentpersonEntity);
 			cv.put(CommentsPersonReadEntry.Columns.COMMENT_ID, getAsInt(comment,Comments.Columns.ID));
 			cv.put(CommentsPersonReadEntry.Columns.PERSON_ID,getAsInt(person, Persons.Columns.ID));
-			
-			Log.i("Disc","insertCommentPersonEntry: "+cv.toString());
 			
 			insertValues(CommentsPersonReadEntry.CONTENT_URI, cv);
 		}
@@ -590,10 +566,7 @@ public class OdataReadClientWithBatchTransactions extends BaseOdataClient {
 		if ((topic != null) && (person != null)) {
 			cv.put(Points.Columns.TOPIC_ID, getAsInt(topic, Topics.Columns.ID));
 			cv.put(Points.Columns.PERSON_ID, getAsInt(person, Persons.Columns.ID));
-			
 			cv.put(Points.Columns.ISNEW,1);
-			
-			Log.i("Disc","NEW POINT CV:"+String.valueOf(cv));
 			
 			insertValues(Points.CONTENT_URI, cv);
 		} else {
@@ -628,10 +601,6 @@ public class OdataReadClientWithBatchTransactions extends BaseOdataClient {
 		if (discussion != null) {
 			ContentValues cv = OEntityToContentValue(topic);
 			cv.put(Topics.Columns.DISCUSSION_ID, getAsInt(discussion, Discussions.Columns.ID));
-			
-			//Log.i("Disc insertTopic ContentValues",String.valueOf(cv));
-			Log.i("Disc insertTopic topic",String.valueOf(topic));
-			
 			
 			insertValues(Topics.CONTENT_URI, cv);
 		} else {
@@ -676,8 +645,6 @@ public class OdataReadClientWithBatchTransactions extends BaseOdataClient {
 		logd("[updatePointComments] comment entities count: " + comments.count());
 		String selection = Comments.Columns.POINT_ID + "=?";
 		String[] args = new String[] { String.valueOf(pointId) };
-		
-		Log.i("Disc point comments args",String.valueOf(args));
 		
 		deleteValues(Comments.CONTENT_URI, selection, args);
 		for (OEntity comment : comments) {

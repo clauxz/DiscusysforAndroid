@@ -65,7 +65,6 @@ public class WebReportViewActivity extends BaseActivity {
 			@Override
 			public void onPageStarted(WebView view, String url, Bitmap favicon) {
 				if(mMenuItem!=null){
-					//Log.i("Disc","show progressbar URL:   "+String.valueOf(url));
 					mMenuItem.setVisible(true);
 				}
 				super.onPageStarted(view, url, favicon);
@@ -73,39 +72,15 @@ public class WebReportViewActivity extends BaseActivity {
 			
 			@Override
 			public void onPageFinished(WebView view, String url) {
-				
-				
 				if(mMenuItem!=null){
-					//Log.i("Disc","hide progressbar URL:   "+String.valueOf(url));
 					mMenuItem.setVisible(false);//hide progress bar 
-					
-					
 				}
-				
 				IsShowBlock=isWebViewShowLinkBlock(url);
-				
 				super.onPageFinished(view, url);
 			}
 		});
-		/*
-		mWebView.setOnTouchListener(new View.OnTouchListener() {
-			
-			@Override
-			public boolean onTouch(View v, MotionEvent event) {
-			
-				WebView.HitTestResult hr=((WebView)v).getHitTestResult();
-				Log.i("Disc", "getExtra = "+ hr.getExtra() + "\t\t Type=" + hr.getType());
-				if(hr.getType()==WebView.HitTestResult.ANCHOR_TYPE){
-					Log.i("Disc WEB","EXTRA:"+String.valueOf(hr.getExtra()));
-				}
-					
-				return false;
-			}
-		});
-		//*/
-		mWebView.getSettings().setBuiltInZoomControls(true);
 		
-		//mWebView.getSettings().setLoadWithOverviewMode(true);
+		mWebView.getSettings().setBuiltInZoomControls(true);
 		mWebView.getSettings().setUseWideViewPort(true);
 
 		
@@ -187,35 +162,11 @@ public class WebReportViewActivity extends BaseActivity {
 		Log.v("Disc report","Report URl:"+url);
 		mEditText.setText(url);
 		
-		/*
-		//Can be added if need to add button in to the <div class='toc'...
-		mWebView.setOnTouchListener(new View.OnTouchListener() {
-			
-			@Override
-			public boolean onTouch(View v, MotionEvent event) {
-				// TODO Auto-generated method stub
-				
-				WebView.HitTestResult hr=((WebView)v).getHitTestResult();
-				if(hr!=null)
-					Log.i("Disc WEB TOUCH","TYPE:"+String.valueOf(hr.getType())+" EXTRA:"+String.valueOf(hr.getExtra()));
-				
-				
-				if(event.getAction()==MotionEvent.ACTION_MOVE)
-				{
-					Log.i("Disc","ACTION MOVE");
-				}
-				return false;
-			}
-		});
-		//*/
-		
-		
 		mWebView.setFocusable(true);
 		mWebView.loadUrl(url);
 		
 		
-		if(mMenuItem!=null)
-		{
+		if(mMenuItem!=null){
 			mMenuItem.setVisible(true);
 		}
 	}

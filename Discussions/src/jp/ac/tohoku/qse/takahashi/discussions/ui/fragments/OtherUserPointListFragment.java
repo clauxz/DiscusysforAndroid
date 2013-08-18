@@ -90,20 +90,6 @@ public class OtherUserPointListFragment extends SherlockListFragment {
 							{
 								((ImageView)view).setImageBitmap(null);
 							}
-							
-							/*
-							int index=cursor.getColumnIndexOrThrow(Points.Columns.IsReadedPointFlag);
-							int isNew=cursor.getInt(index);
-							
-							if(isNew>0){
-								((ImageView)view).setImageBitmap(
-										BitmapFactory.decodeResource(getResources(), R.drawable.ic_data_changed));
-							}
-							else
-							{
-								((ImageView)view).setImageBitmap(null);
-							}
-							//*/
 						}
 						return true;
 					default:
@@ -175,50 +161,6 @@ public class OtherUserPointListFragment extends SherlockListFragment {
 
 	protected void updateCommentsStatus(){
 		notificationPoint=new NotificationPoint(getActivity(),mPersonId,mTopicId,NotificationPoint.MODE_ALL_USERS);
-		/*
-		if(getActivity() instanceof PointDetailsActivity){
-			boolean com=false;
-			
-			ArrayList<Integer> ids=new ArrayList<Integer>();
-			
-			if(mOtherPointsAdapter!=null)
-			{
-				Cursor cursor=mOtherPointsAdapter.getCursor();
-				cursor.moveToFirst();
-				
-				if(cursor!= null && 0<cursor.getCount()){
-					
-					do
-					{
-						int index=cursor.getColumnIndex(Points.Columns.ID);
-						int indexTopic=cursor.getColumnIndexOrThrow(Points.Columns.TOPIC_ID);
-						int id=cursor.getInt(index);
-						int topic=cursor.getInt(indexTopic);
-						
-						if(topic==mTopicId)
-							if(id!=Integer.MIN_VALUE)
-							{
-								if(notificationPoint.IsPointContainNewComments(id))
-								{
-									Log.i("Disc Ueer","NEW COMMENTS CONTAINED");
-									
-									com=true;
-									((PointDetailsActivity)getActivity()).setNewComments(com);
-									((PointDetailsActivity)getActivity()).updateCommentIcon();
-									
-									return;
-								}
-							}
-					}while(cursor.moveToNext());
-					
-					
-				}
-			}
-			
-			((PointDetailsActivity)getActivity()).setNewComments(com);
-			((PointDetailsActivity)getActivity()).updateCommentIcon();
-		}
-		//*/
 	}
 	
 	private class OtherUserPointsCursorLoader implements LoaderManager.LoaderCallbacks<Cursor> {

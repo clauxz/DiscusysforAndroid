@@ -110,16 +110,6 @@ public class Point implements Value {
 			int topicIdIndex = cursor.getColumnIndexOrThrow(Points.Columns.TOPIC_ID);
 			
 			changesPending = false;
-			/*
-			if (cursor.getInt(changesPendingIndex) == 0) {
-				changesPending = false;
-			} else if (cursor.getInt(changesPendingIndex) == 1) {
-				changesPending = true;
-			} else {
-				throw new IllegalStateException("Point cursor has unknown changes pending value: "
-						+ cursor.getInt(changesPendingIndex));
-			}
-			//*/
 			orderNumber = cursor.getInt(orderNumIndex);
 			id = cursor.getInt(idIndex);
 			name = cursor.getString(nameIndex);
@@ -131,17 +121,6 @@ public class Point implements Value {
 			//recentlyEnteredSource = cursor.getString(recentlyEnteredSourceIndex);
 			sharedToPublic = true;
 			sideCode = 0;
-			/*
-			if (cursor.getInt(sharedToPublicIndex) == 0) {
-				sharedToPublic = false;
-			} else if (cursor.getInt(sharedToPublicIndex) == 1) {
-				sharedToPublic = true;
-			} else {
-				throw new IllegalStateException("Point has unknown shared to public: "
-						+ cursor.getInt(sharedToPublicIndex));
-			}
-			sideCode = cursor.getInt(sideCodeIndex);
-			//*/
 			topicId = cursor.getInt(topicIdIndex);
 		}
 		else

@@ -47,85 +47,11 @@ public class SyncStatusUpdaterFragment extends  Fragment implements DetachableRe
 
 	@Override
 	public void onActivityCreated(final Bundle savedInstanceState) {
-
 		super.onActivityCreated(savedInstanceState);
-
-		//createServerDialog();
 		createProgressDialog();
 	}
 
-	/*
-	private void createServerDialog()
-	{
-		AlertDialog.Builder builder=new AlertDialog.Builder(getActivity());
-		builder.setTitle(R.string.dialog_title_settings_server);
 		
-		builder.setNegativeButton(R.string.button_title_cancel, new DialogInterface.OnClickListener() {
-			
-			@Override
-			public void onClick(DialogInterface dialog, int which) {
-				// TODO Auto-generated method stub
-				createProgressDialog();
-				if((getActivity() instanceof PersonsActivity) &&
-						(getActivity()!=null))
-				{
-					((PersonsActivity)getActivity()).triggerRefresh();
-				}
-				
-			}
-			
-		});
-		
-		int initSelection=0;
-		initSelection=PreferenceHelper.getPhotonDbAddressPointer(getActivity());
-		if( getResources().getStringArray(R.array.server_names).length<=initSelection)
-			initSelection=0;
-		
-		builder.setSingleChoiceItems(R.array.server_names,initSelection,new DialogInterface.OnClickListener() {
-			
-			@Override
-			public void onClick(DialogInterface dialog, int which) {
-				
-				switch(which)
-				{
-				case PreferenceHelper.SERVER_LOCAL:
-					Log.v("Discussions","[set server] LOCAL");
-					PreferenceHelper.setServerAddress(getActivity(), getString(R.string.local_server_address));
-					break;
-				case PreferenceHelper.SERVER_PUBLIC:
-					Log.v("Discussions","[set server] PUBLIC");
-					PreferenceHelper.setServerAddress(getActivity(), getString(R.string.public_server_address));
-					break;
-				case PreferenceHelper.SERVER_OFFLINE:
-					Log.v("Discussions","[set server] OFFLINE");
-					PreferenceHelper.setServerAddress(getActivity(), getString(R.string.offline_server_address));
-					break;
-				case PreferenceHelper.SERVER_DEVELOPMENT:
-					Log.v("Discussions","[set server] DEVELOPMENT");
-					PreferenceHelper.setServerAddress(getActivity(), getString(R.string.development_server_address));
-					break;
-				}
-				
-				if(mServerAddressDialog!=null)
-					mServerAddressDialog.cancel();
-				
-				createProgressDialog();
-				if((getActivity() instanceof PersonsActivity) &&
-						(getActivity()!=null))
-				{
-					((PersonsActivity)getActivity()).triggerRefresh();
-				}
-				
-			}
-		});
-		
-		mServerAddressDialog=builder.create();
-		if(mServerAddressDialog!=null)
-			mServerAddressDialog.show();
-	}
-	//*/
-	
-	
 	private void createProgressDialog(){
 		// Setup progress dialog
 		mProgressDialog = new ProgressDialog(getActivity());
@@ -186,9 +112,6 @@ public class SyncStatusUpdaterFragment extends  Fragment implements DetachableRe
 					
 					final String errorText = getString(R.string.toast_sync_error, resultData
 							.getString(Intent.EXTRA_TEXT));
-					
-					Log.i("Disc frg onReceiveResult ",errorText);
-					
 					showLongToast(errorText);
 				}
 				break;
